@@ -340,7 +340,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 }
 .tcp-map{
   position:relative;
-  min-height:470px;
+  min-height:540px;
   background:linear-gradient(180deg,#081121,#0a1325);
   border:1px solid var(--border);
   border-radius:12px;
@@ -350,7 +350,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 .tcp-map-grid{
   display:grid;
   grid-template-columns: 1fr 1.2fr 1fr;
-  grid-template-rows: 42px repeat(4, 88px);
+  grid-template-rows: 42px repeat(4, 105px);
   gap:8px;
   height:100%;
 }
@@ -394,6 +394,51 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   font-size:11px;
   color:var(--muted);
   line-height:1.45;
+}
+.layer-snapshot{
+  min-height:28px;
+  margin-top:7px;
+  display:flex;
+  gap:4px;
+  align-items:flex-end;
+  flex-wrap:wrap;
+}
+.snapshot-pkt{
+  position:relative;
+  min-width:28px;
+  min-height:22px;
+  border-radius:4px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(69,217,206,.42);
+  color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;
+  line-height:1.15;
+  padding:3px 4px;
+  opacity:.78;
+}
+.snapshot-pkt.single{
+  min-width:74px;
+}
+.snapshot-pkt.response{
+  background:rgba(245,166,35,.46);
+}
+.snapshot-pkt.tcp{
+  border-left:5px solid #4ade80;
+}
+.snapshot-pkt.ip{
+  border-left:5px solid #6fb7ff;
+  border-top:5px solid rgba(111,183,255,.60);
+}
+.snapshot-pkt.removed{
+  background:rgba(139,160,196,.20);
+  border-style:dashed;
+}
+.snapshot-label{
+  width:100%;
+  color:var(--muted-2);
+  font-size:9px;
+  margin-bottom:1px;
 }
 .tcp-wire{
   grid-row:2/6;
@@ -459,7 +504,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   font-size:10px;
   font-weight:700;
   padding:4px;
-  box-shadow:0 8px 22px rgba(0,0,0,.35);
+  box-shadow:0 6px 16px rgba(0,0,0,.26);
+  opacity:.82;
   transition:width .2s ease, min-height .2s ease, opacity .2s ease;
 }
 .tcp-mini-packet.single{
@@ -711,7 +757,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
           <div class="tcp-head"><b>ネットワーク</b><span>ルータを通って移動</span></div>
           <div class="tcp-head"><b id="tcpServerName">www.school.jp</b><span class="mono" id="tcpServerIp">192.0.2.10</span></div>
 
-          <div class="tcp-layer" id="cApp"><div class="lname">アプリケーション層</div><div class="ldata">HTTP: <span id="tcpReqLabel">GET /index.html</span></div></div>
+          <div class="tcp-layer" id="cApp"><div class="lname">アプリケーション層</div><div class="ldata">HTTP: <span id="tcpReqLabel">GET /index.html</span></div><div class="layer-snapshot" id="snap-cApp"></div></div>
           <div class="tcp-wire" id="tcpWire" rowspan="4">
             <div class="router-chain">
               <div class="router">ルータ1<br><span class="mono">中継</span></div>
@@ -719,16 +765,16 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
               <div class="router">ルータ2<br><span class="mono">中継</span></div>
             </div>
           </div>
-          <div class="tcp-layer" id="sApp"><div class="lname">アプリケーション層</div><div class="ldata">HTTPデータを読み取る</div></div>
+          <div class="tcp-layer" id="sApp"><div class="lname">アプリケーション層</div><div class="ldata">HTTPデータを読み取る</div><div class="layer-snapshot" id="snap-sApp"></div></div>
 
-          <div class="tcp-layer" id="cTrans"><div class="lname">トランスポート層</div><div class="ldata">TCP: 1/4, 2/4, 3/4, 4/4</div></div>
-          <div class="tcp-layer" id="sTrans"><div class="lname">トランスポート層</div><div class="ldata">TCP番号で順番を確認</div></div>
+          <div class="tcp-layer" id="cTrans"><div class="lname">トランスポート層</div><div class="ldata">TCP: 1/4, 2/4, 3/4, 4/4</div><div class="layer-snapshot" id="snap-cTrans"></div></div>
+          <div class="tcp-layer" id="sTrans"><div class="lname">トランスポート層</div><div class="ldata">TCP番号で順番を確認</div><div class="layer-snapshot" id="snap-sTrans"></div></div>
 
-          <div class="tcp-layer" id="cInet"><div class="lname">インターネット層</div><div class="ldata">IP: 192.168.1.10 → <span id="tcpDstInline">192.0.2.10</span></div></div>
-          <div class="tcp-layer" id="sInet"><div class="lname">インターネット層</div><div class="ldata">宛先IPが自分か確認</div></div>
+          <div class="tcp-layer" id="cInet"><div class="lname">インターネット層</div><div class="ldata">IP: 192.168.1.10 → <span id="tcpDstInline">192.0.2.10</span></div><div class="layer-snapshot" id="snap-cInet"></div></div>
+          <div class="tcp-layer" id="sInet"><div class="lname">インターネット層</div><div class="ldata">宛先IPが自分か確認</div><div class="layer-snapshot" id="snap-sInet"></div></div>
 
-          <div class="tcp-layer" id="cNet"><div class="lname">ネットワーク<br>インタフェース層</div><div class="ldata">0と1の信号として送り出す</div></div>
-          <div class="tcp-layer" id="sNet"><div class="lname">ネットワーク<br>インタフェース層</div><div class="ldata">届いた信号を受け取る</div></div>
+          <div class="tcp-layer" id="cNet"><div class="lname">ネットワーク<br>インタフェース層</div><div class="ldata">0と1の信号として送り出す</div><div class="layer-snapshot" id="snap-cNet"></div></div>
+          <div class="tcp-layer" id="sNet"><div class="lname">ネットワーク<br>インタフェース層</div><div class="ldata">届いた信号を受け取る</div><div class="layer-snapshot" id="snap-sNet"></div></div>
         </div>
         <div class="tcp-packets-layer hidden" id="tcpPacketsLayer">
           <div class="tcp-mini-packet" id="tcpPkt1"><div class="pkt-ip"></div><div class="pkt-tcp"></div><div class="pkt-body"></div></div>
@@ -988,6 +1034,33 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     });
   }
 
+  function clearSnapshots(){
+    document.querySelectorAll('.layer-snapshot').forEach(function(el){
+      el.innerHTML = '';
+    });
+  }
+
+  function snapshotPieces(kind, response){
+    var prefix = response ? 'HTML' : 'HTTP';
+    if(kind === 'single'){
+      return '<div class="snapshot-pkt single '+(response?'response':'')+'">'+prefix+'データ</div>';
+    }
+    var cls = 'snapshot-pkt ' + kind + (response ? ' response' : '');
+    var html = '';
+    for(var i=1;i<=4;i++){
+      var label = kind === 'ip' ? 'IP<br>'+i+'/4' : (kind === 'tcp' ? 'TCP<br>'+i+'/4' : i+'/4');
+      html += '<div class="'+cls+'">'+label+'</div>';
+    }
+    return html;
+  }
+
+  function writeSnapshot(layerId, title, kind, response){
+    if(!layerId) return;
+    var el = $('snap-'+layerId);
+    if(!el) return;
+    el.innerHTML = '<div class="snapshot-label">'+title+'</div>' + snapshotPieces(kind, response);
+  }
+
   function animateTcpPackets(from, to, duration, myRun, clustered){
     return new Promise(function(resolve){
       var finished = 0;
@@ -1021,6 +1094,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     clearTcpLayerHighlights();
     if(step.layer){ $(step.layer).classList.add('active'); }
     configureTcpPackets(step);
+    if(step.snapshot){ writeSnapshot(step.layer, step.snapshot, step.snapKind || 'single', !!step.response); }
     $('tcpExplanation').innerHTML = step.explain;
     await wait(step.pause || 360);
     return myRun === tcpAnimRun;
@@ -1037,28 +1111,28 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     $('tcpPacketsLayer').classList.remove('hidden');
     var p = tcpPoints();
     var requestPath = [
-      {key:'cApp', layer:'cApp', form:'single', label:'HTTP<br>GET '+LAST_INFO.path, explain:'<b>アプリケーション層</b>で、HTTPの「'+LAST_INFO.path+' がほしい」という1つのデータを作ります。'},
-      {key:'cTrans', layer:'cTrans', tcp:true, label:'TCP', explain:'<b>トランスポート層</b>で、1つのデータを4つに分け、TCP 1/4〜4/4の番号を付けます。'},
-      {key:'cInet', layer:'cInet', tcp:true, ip:true, label:'IP', explain:'<b>インターネット層</b>で、それぞれの外側に宛先IPアドレスを付けます。'},
-      {key:'cNet', layer:'cNet', tcp:true, ip:true, label:'0/1', explain:'<b>ネットワークインタフェース層</b>で、4つのパケットを実際の回線へ少しずつ送り出します。'},
+      {key:'cApp', layer:'cApp', form:'single', label:'HTTP<br>GET '+LAST_INFO.path, snapshot:'HTTPデータを作成', snapKind:'single', explain:'<b>アプリケーション層</b>で、HTTPの「'+LAST_INFO.path+' がほしい」という1つのデータを作ります。'},
+      {key:'cTrans', layer:'cTrans', tcp:true, label:'TCP', snapshot:'TCPを追加・4分割', snapKind:'tcp', explain:'<b>トランスポート層</b>で、1つのデータを4つに分け、TCP 1/4〜4/4の番号を付けます。'},
+      {key:'cInet', layer:'cInet', tcp:true, ip:true, label:'IP', snapshot:'IPを外側に追加', snapKind:'ip', explain:'<b>インターネット層</b>で、それぞれの外側に宛先IPアドレスを付けます。'},
+      {key:'cNet', layer:'cNet', tcp:true, ip:true, label:'0/1', snapshot:'回線へ送信', snapKind:'ip', explain:'<b>ネットワークインタフェース層</b>で、4つのパケットを実際の回線へ少しずつ送り出します。'},
       {key:'r1', tcp:true, ip:true, label:'中継', explain:'4つのパケットが少しずつずれてルータ1を通過します。ルータはIPの宛先を見ます。'},
       {key:'r2', tcp:true, ip:true, label:'中継', explain:'パケットは同じ通信の一部ですが、1/4〜4/4のように小さな単位で移動します。'},
-      {key:'sNet', layer:'sNet', tcp:true, ip:true, label:'受信', explain:'Webサーバ側のネットワークインタフェース層が4つのパケットを受け取ります。'},
-      {key:'sInet', layer:'sInet', tcp:true, ip:true, label:'IP確認', explain:'IPの外側の情報を確認し、自分宛てのパケットだと判断します。'},
-      {key:'sTrans', layer:'sTrans', tcp:true, label:'TCP確認', explain:'TCPの番号を使って、分かれていたデータを正しい順番に整えます。'},
-      {key:'sApp', layer:'sApp', form:'single', label:'HTTP<br>GET '+LAST_INFO.path, explain:'最後にHTTPデータが取り出され、Webサーバが要求内容を読み取ります。'}
+      {key:'sNet', layer:'sNet', tcp:true, ip:true, label:'受信', snapshot:'回線から受信', snapKind:'ip', explain:'Webサーバ側のネットワークインタフェース層が4つのパケットを受け取ります。'},
+      {key:'sInet', layer:'sInet', tcp:true, ip:true, label:'IP確認', snapshot:'IPを確認して外す', snapKind:'tcp', explain:'IPの外側の情報を確認し、自分宛てのパケットだと判断します。ここでIPの情報は役目を終えます。'},
+      {key:'sTrans', layer:'sTrans', tcp:true, label:'TCP確認', snapshot:'TCP番号で復元', snapKind:'single', explain:'TCPの番号を使って、分かれていたデータを正しい順番に整えます。ここでTCPの情報は役目を終えます。'},
+      {key:'sApp', layer:'sApp', form:'single', label:'HTTP<br>GET '+LAST_INFO.path, snapshot:'HTTPデータを取得', snapKind:'single', explain:'最後にHTTPデータが取り出され、Webサーバが要求内容を読み取ります。'}
     ];
     var responsePath = [
-      {key:'sApp', layer:'sApp', form:'single', label:'HTTP<br>HTML応答', response:true, explain:'Webサーバは、要求されたindex.htmlをHTTPの応答として用意します。'},
-      {key:'sTrans', layer:'sTrans', tcp:true, response:true, label:'TCP', explain:'応答データもTCPで4つに分けられ、順番の番号が付きます。'},
-      {key:'sInet', layer:'sInet', tcp:true, ip:true, response:true, label:'IP', explain:'今度は送信側PCのIPアドレスを宛先として、IPの情報を外側に付けます。'},
-      {key:'sNet', layer:'sNet', tcp:true, ip:true, response:true, label:'0/1', explain:'Webサーバ側から4つのパケットをネットワークへ送り出します。'},
+      {key:'sApp', layer:'sApp', form:'single', label:'HTTP<br>HTML応答', response:true, snapshot:'HTTP応答を作成', snapKind:'single', explain:'Webサーバは、要求されたindex.htmlをHTTPの応答として用意します。'},
+      {key:'sTrans', layer:'sTrans', tcp:true, response:true, label:'TCP', snapshot:'TCPを追加・4分割', snapKind:'tcp', explain:'応答データもTCPで4つに分けられ、順番の番号が付きます。'},
+      {key:'sInet', layer:'sInet', tcp:true, ip:true, response:true, label:'IP', snapshot:'IPを外側に追加', snapKind:'ip', explain:'今度は送信側PCのIPアドレスを宛先として、IPの情報を外側に付けます。'},
+      {key:'sNet', layer:'sNet', tcp:true, ip:true, response:true, label:'0/1', snapshot:'回線へ送信', snapKind:'ip', explain:'Webサーバ側から4つのパケットをネットワークへ送り出します。'},
       {key:'r2', tcp:true, ip:true, response:true, label:'中継', explain:'応答パケットが少しずつずれてルータ2を通過します。'},
       {key:'r1', tcp:true, ip:true, response:true, label:'中継', explain:'ルータが宛先IPアドレスを見て、ブラウザ側へ中継します。'},
-      {key:'cNet', layer:'cNet', tcp:true, ip:true, response:true, label:'受信', explain:'送信側PCのネットワークインタフェース層が4つの応答パケットを受け取ります。'},
-      {key:'cInet', layer:'cInet', tcp:true, ip:true, response:true, label:'IP確認', explain:'IPの情報を確認し、自分宛てのパケットだと分かります。'},
-      {key:'cTrans', layer:'cTrans', tcp:true, response:true, label:'TCP復元', explain:'TCPが1/4〜4/4の番号を使ってHTMLデータを正しい順番に戻します。'},
-      {key:'cApp', layer:'cApp', form:'single', label:'HTTP<br>HTML応答', response:true, explain:'HTTPの応答がブラウザへ渡り、Webページ表示につながります。'}
+      {key:'cNet', layer:'cNet', tcp:true, ip:true, response:true, label:'受信', snapshot:'回線から受信', snapKind:'ip', explain:'送信側PCのネットワークインタフェース層が4つの応答パケットを受け取ります。'},
+      {key:'cInet', layer:'cInet', tcp:true, ip:true, response:true, label:'IP確認', snapshot:'IPを確認して外す', snapKind:'tcp', explain:'IPの情報を確認し、自分宛てのパケットだと分かります。ここでIPの情報は取り外されます。'},
+      {key:'cTrans', layer:'cTrans', tcp:true, response:true, label:'TCP復元', snapshot:'TCP番号で復元', snapKind:'single', explain:'TCPが1/4〜4/4の番号を使ってHTMLデータを正しい順番に戻します。'},
+      {key:'cApp', layer:'cApp', form:'single', label:'HTTP<br>HTML応答', response:true, snapshot:'ブラウザへ渡す', snapKind:'single', explain:'HTTPの応答がブラウザへ渡り、Webページ表示につながります。'}
     ];
     var steps = requestPath.concat(responsePath);
     configureTcpPackets(steps[0]);
@@ -1081,13 +1155,14 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     tcpRunning = false;
     updateTcpLabels();
     clearTcpLayerHighlights();
+    clearSnapshots();
     $('tcpPacketsLayer').classList.add('hidden');
     tcpPacketEls().forEach(function(el){
       el.className = 'tcp-mini-packet';
     });
     $('tcpPlayBtn').disabled = false;
     $('tcpPlayBtn').textContent = '4層の流れを見る';
-    $('tcpExplanation').innerHTML = '<b>流れの見方：</b>送信側PCで1つのHTTPデータがTCPによって4つに分かれ、IPの宛先情報を外側に付けて流れます。受信側では逆に外側から確認して元のデータへ戻します。';
+    $('tcpExplanation').innerHTML = '<b>流れの見方：</b>動くパケットは控えめに流れます。各層に残る小さな履歴を見ると、TCPやIPの情報がどこで追加され、どこで取り外されたか確認できます。';
   }
 
   function setFileActive(type, on){
