@@ -323,42 +323,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
 /* TCP/IP detail mode */
 .tcp-mode{
-  display:grid;
-  grid-template-columns: 260px 1fr 260px;
-  gap:12px;
+  display:block;
   margin-bottom:12px;
-}
-.tcp-node{
-  min-height:430px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.tcp-device{
-  background:#0c1424;
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:10px;
-  min-height:94px;
-}
-.tcp-device-name{
-  font-family:'Space Grotesk',sans-serif;
-  font-weight:700;
-  font-size:14px;
-  margin-bottom:5px;
-}
-.tcp-device-ip{
-  font-family:'JetBrains Mono',monospace;
-  color:var(--http);
-  font-size:12px;
-}
-.tcp-role{
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.55;
-}
-.tcp-center{
-  min-height:430px;
 }
 .tcp-actions{
   display:flex;
@@ -372,120 +338,164 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   cursor:not-allowed;
   filter:none;
 }
-.tcp-flow{
-  display:grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap:7px;
-  margin-bottom:12px;
-}
-.tcp-flow-step{
-  background:#0c1424;
-  border:1px solid var(--border);
-  color:var(--muted-2);
-  border-radius:8px;
-  padding:8px 6px;
-  text-align:center;
-  font-size:11px;
-}
-.tcp-flow-step.done{border-color:var(--ok); color:var(--text);}
-.tcp-flow-step.active{
-  border-color:var(--http);
-  color:var(--text);
-  box-shadow:0 0 0 2px rgba(69,217,206,.18) inset;
-}
-.tcp-workspace{
-  background:#081121;
+.tcp-map{
+  position:relative;
+  min-height:470px;
+  background:linear-gradient(180deg,#081121,#0a1325);
   border:1px solid var(--border);
   border-radius:12px;
-  min-height:280px;
   padding:12px;
   overflow:hidden;
 }
-.layer-stack{
+.tcp-map-grid{
+  display:grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  grid-template-rows: 42px repeat(4, 88px);
+  gap:8px;
+  height:100%;
+}
+.tcp-head{
   display:flex;
   flex-direction:column;
-  align-items:center;
-  gap:8px;
-  min-height:150px;
   justify-content:center;
-}
-.layer-box{
-  width:min(520px,100%);
-  border:2px solid var(--border);
-  border-radius:10px;
-  padding:10px;
+  align-items:center;
+  gap:2px;
   background:#0c1424;
-  transition:all .25s ease;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:12px;
+  color:var(--muted);
 }
-.layer-box.http{border-color:var(--http);}
-.layer-box.tcp{border-color:var(--ok);}
-.layer-box.ip{border-color:var(--html-c);}
-.layer-title{
+.tcp-head b{color:var(--text);font-size:13px;}
+.tcp-layer{
+  border:1px solid var(--border);
+  background:#101a2d;
+  border-radius:8px;
+  padding:9px 10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  transition:border-color .18s, box-shadow .18s, background .18s;
+}
+.tcp-layer.active{
+  border-color:var(--http);
+  box-shadow:0 0 0 2px rgba(69,217,206,.20) inset, 0 0 14px rgba(69,217,206,.16);
+  background:#13243b;
+}
+.tcp-layer .lname{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:4px;
+}
+.tcp-layer .ldata{
   font-family:'JetBrains Mono',monospace;
   font-size:11px;
   color:var(--muted);
-  margin-bottom:6px;
+  line-height:1.45;
 }
-.layer-body{
-  font-family:'JetBrains Mono',monospace;
-  font-size:13px;
-  color:var(--text);
-}
-.segments{
-  display:grid;
-  grid-template-columns:repeat(4, minmax(70px,1fr));
-  gap:8px;
-  margin-top:10px;
-}
-.segment{
+.tcp-wire{
+  grid-row:2/6;
+  grid-column:2;
   border:1px solid var(--border);
-  background:#13213a;
+  background:rgba(12,20,36,.58);
   border-radius:8px;
-  padding:8px 6px;
-  font-family:'JetBrains Mono',monospace;
-  font-size:12px;
-  text-align:center;
-}
-.segment.ip{border-color:var(--html-c);}
-.packet-travel{
+  position:relative;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  min-height:84px;
-  margin:14px 0 4px;
+  justify-content:center;
+  color:var(--muted);
 }
-.travel-node{
+.router-chain{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:88%;
+}
+.router{
+  flex:0 0 86px;
+  background:#111a2b;
   border:1px solid var(--border);
   border-radius:9px;
-  background:#111a2b;
-  color:var(--muted);
-  padding:8px 10px;
+  padding:10px 8px;
   font-size:12px;
   text-align:center;
-  min-width:76px;
 }
-.travel-arrow{
+.router-line{
   flex:1;
   height:2px;
-  background:linear-gradient(90deg,var(--http),var(--html-c));
+  background:#304365;
   position:relative;
 }
-.travel-arrow::after{
+.router-line::after{
   content:'';
   position:absolute;
   right:0;
   top:-4px;
-  border-left:8px solid var(--html-c);
+  border-left:8px solid #304365;
   border-top:5px solid transparent;
   border-bottom:5px solid transparent;
 }
-.receive-order{
+.tcp-packet{
+  position:absolute;
+  left:16%;
+  top:18%;
+  transform:translate(-50%,-50%);
+  width:118px;
+  min-height:42px;
+  border-radius:9px;
+  border:2px solid var(--http);
+  background:#45d9ce;
+  color:#04121a;
   display:flex;
-  gap:8px;
+  align-items:center;
   justify-content:center;
-  flex-wrap:wrap;
+  text-align:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  font-weight:700;
+  padding:6px;
+  box-shadow:0 8px 22px rgba(0,0,0,.35);
+  z-index:5;
+  pointer-events:none;
+}
+.tcp-packet.response{
+  background:#f5a623;
+  border-color:#f5a623;
+}
+.tcp-trail{
+  position:absolute;
+  border-radius:50%;
+  width:8px;
+  height:8px;
+  background:rgba(69,217,206,.45);
+  transform:translate(-50%,-50%);
+  z-index:4;
+}
+.tcp-legend{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:8px;
   margin-top:10px;
+}
+.legend-card{
+  background:#0c1424;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px;
+  min-height:64px;
+}
+.legend-card b{
+  color:var(--text);
+  font-size:12px;
+}
+.legend-card span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.45;
+  margin-top:4px;
 }
 .tcp-summary{
   margin-top:12px;
@@ -501,9 +511,10 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
 @media (max-width: 980px){
   .stage{grid-template-columns:1fr;}
-  .tcp-mode{grid-template-columns:1fr;}
-  .tcp-flow{grid-template-columns:1fr 1fr;}
-  .segments{grid-template-columns:1fr 1fr;}
+  .tcp-map-grid{grid-template-columns:1fr; grid-template-rows:auto; height:auto;}
+  .tcp-wire{grid-column:auto; grid-row:auto; min-height:120px;}
+  .tcp-map{min-height:760px;}
+  .tcp-legend{grid-template-columns:1fr 1fr;}
   .browser,.network{grid-row:auto;}
   .bottom{grid-template-columns:1fr;}
 }
@@ -653,48 +664,47 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   </div>
 
   <div id="tcpMode" class="tcp-mode hidden">
-    <div class="panel tcp-node">
-      <div class="panel-title"><span class="dot dot-browser"></span>送信側PC</div>
-      <div class="tcp-device">
-        <div class="tcp-device-name">ブラウザ</div>
-        <div class="tcp-device-ip" id="tcpClientIp">192.168.1.10</div>
-        <div class="tcp-role">URLを入力したコンピュータ。HTTPで「index.htmlをください」と要求します。</div>
-      </div>
-      <div class="tcp-summary">
-        <b>送信側の順番</b><br>
-        HTTPデータに、TCPの番号、IPアドレスの情報を順番に付け加えてネットワークへ出します。
-      </div>
-    </div>
-
-    <div class="panel tcp-center">
+    <div class="panel">
       <div class="panel-title"><span class="dot dot-net"></span>通信の中身</div>
       <div class="tcp-actions">
-        <button class="btn btn-go" id="tcpStepBtn">通信の準備をする</button>
+        <button class="btn btn-go" id="tcpPlayBtn">4層の流れを見る</button>
         <button class="btn btn-reset" id="tcpResetBtn">最初から見る</button>
         <button class="btn btn-ghost" id="backToWebBtn">Web表示に戻る</button>
       </div>
-      <div class="tcp-flow" id="tcpFlow">
-        <div class="tcp-flow-step active" data-step="0">HTTP</div>
-        <div class="tcp-flow-step" data-step="1">TCPで分割</div>
-        <div class="tcp-flow-step" data-step="2">IPで宛先設定</div>
-        <div class="tcp-flow-step" data-step="3">ルータを通過</div>
-        <div class="tcp-flow-step" data-step="4">受信側で復元</div>
-      </div>
-      <div class="tcp-workspace" id="tcpWorkspace"></div>
-      <div class="tcp-summary" id="tcpExplanation"></div>
-    </div>
+      <div class="tcp-map" id="tcpMap">
+        <div class="tcp-map-grid">
+          <div class="tcp-head"><b>送信側PC</b><span class="mono">192.168.1.10</span></div>
+          <div class="tcp-head"><b>ネットワーク</b><span>ルータを通って移動</span></div>
+          <div class="tcp-head"><b id="tcpServerName">www.school.jp</b><span class="mono" id="tcpServerIp">192.0.2.10</span></div>
 
-    <div class="panel tcp-node">
-      <div class="panel-title"><span class="dot dot-web"></span>Webサーバ</div>
-      <div class="tcp-device">
-        <div class="tcp-device-name" id="tcpServerName">www.school.jp</div>
-        <div class="tcp-device-ip" id="tcpServerIp">192.0.2.10</div>
-        <div class="tcp-role">DNSで調べたIPアドレスを持つ相手。受け取ったデータからHTTPの要求を取り出します。</div>
+          <div class="tcp-layer" id="cApp"><div class="lname">アプリケーション層</div><div class="ldata">HTTP: <span id="tcpReqLabel">GET /index.html</span></div></div>
+          <div class="tcp-wire" id="tcpWire" rowspan="4">
+            <div class="router-chain">
+              <div class="router">ルータ1<br><span class="mono">中継</span></div>
+              <div class="router-line"></div>
+              <div class="router">ルータ2<br><span class="mono">中継</span></div>
+            </div>
+          </div>
+          <div class="tcp-layer" id="sApp"><div class="lname">アプリケーション層</div><div class="ldata">HTTPデータを読み取る</div></div>
+
+          <div class="tcp-layer" id="cTrans"><div class="lname">トランスポート層</div><div class="ldata">TCP: 1/4, 2/4, 3/4, 4/4</div></div>
+          <div class="tcp-layer" id="sTrans"><div class="lname">トランスポート層</div><div class="ldata">TCP番号で順番を確認</div></div>
+
+          <div class="tcp-layer" id="cInet"><div class="lname">インターネット層</div><div class="ldata">IP: 192.168.1.10 → <span id="tcpDstInline">192.0.2.10</span></div></div>
+          <div class="tcp-layer" id="sInet"><div class="lname">インターネット層</div><div class="ldata">宛先IPが自分か確認</div></div>
+
+          <div class="tcp-layer" id="cNet"><div class="lname">ネットワーク<br>インタフェース層</div><div class="ldata">0と1の信号として送り出す</div></div>
+          <div class="tcp-layer" id="sNet"><div class="lname">ネットワーク<br>インタフェース層</div><div class="ldata">届いた信号を受け取る</div></div>
+        </div>
+        <div class="tcp-packet hidden" id="tcpPacket">HTTP<br>GET</div>
       </div>
-      <div class="tcp-summary">
-        <b>受信側の順番</b><br>
-        IPの情報を確認し、TCPの番号を使って順番を整え、最後にHTTPデータを読み取ります。
+      <div class="tcp-legend">
+        <div class="legend-card"><b>HTTP</b><span>Webページの要求や応答の中身を決める。</span></div>
+        <div class="legend-card"><b>TCP</b><span>データを分け、番号で順番を管理する。</span></div>
+        <div class="legend-card"><b>IP</b><span>DNSで分かったIPアドレスを使って届ける。</span></div>
+        <div class="legend-card"><b>ネットワークI/F</b><span>実際の回線へ流せる信号にする。</span></div>
       </div>
+      <div class="tcp-summary" id="tcpExplanation"></div>
     </div>
   </div>
 
@@ -717,7 +727,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   var DNS_IP = "203.0.113.53";
   var LAST_INFO = {domain:"www.school.jp", path:"/index.html", protocol:"https"};
   var LAST_IP = "192.0.2.10";
-  var tcpStep = 0;
+  var tcpAnimRun = 0;
+  var tcpRunning = false;
   var DNS_TABLE = {
     "www.school.jp": "192.0.2.10"
   };
@@ -852,95 +863,151 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     $('tcpModeBtn').classList.toggle('active', !web);
     $('modeHint').textContent = web
       ? 'まずはURL入力からWebページ表示までの流れを見ます。'
-      : 'DNSで分かった同じIPアドレスを使い、HTTP・TCP・IPの働きを詳しく見ます。';
-    if(!web){ renderTcpMode(); }
+      : 'データが4層を下がって送られ、相手側で4層を上がって取り出される流れを見ます。';
+    if(!web){ resetTcpFlow(); }
   }
 
-  function setTcpStep(n){
-    tcpStep = Math.max(0, Math.min(n, 5));
-    renderTcpMode();
-  }
-
-  function tcpSegments(extraClass){
-    var cls = extraClass ? ' segment '+extraClass : ' segment';
-    return '<div class="segments">' +
-      '<div class="'+cls+'">1/4<br>GET</div>' +
-      '<div class="'+cls+'">2/4<br>index</div>' +
-      '<div class="'+cls+'">3/4<br>.html</div>' +
-      '<div class="'+cls+'">4/4<br>完了</div>' +
-    '</div>';
-  }
-
-  function renderTcpMode(){
+  function updateTcpLabels(){
     $('tcpServerName').textContent = LAST_INFO.domain;
     $('tcpServerIp').textContent = LAST_IP;
-    var flowSteps = document.querySelectorAll('#tcpFlow .tcp-flow-step');
-    flowSteps.forEach(function(el){
-      var n = parseInt(el.getAttribute('data-step'),10);
-      el.classList.remove('done','active');
-      if(n < tcpStep) el.classList.add('done');
-      if(n === Math.min(tcpStep,4)) el.classList.add('active');
-    });
+    $('tcpDstInline').textContent = LAST_IP;
+    $('tcpReqLabel').textContent = 'GET ' + LAST_INFO.path;
+  }
 
-    var request = 'GET ' + LAST_INFO.path;
-    var html = '';
-    var exp = '';
-    var btn = '通信の準備をする';
-    if(tcpStep === 0){
-      html = '<div class="layer-stack">' +
-        '<div class="layer-box http"><div class="layer-title">HTTP</div><div class="layer-body">'+request+'</div></div>' +
-        '</div>';
-      exp = '<b>HTTP</b> は、Webページなどのデータをやり取りするための決まりです。ここでは「index.htmlをください」という要求を作っています。';
-      btn = 'TCPで分ける';
-    } else if(tcpStep === 1){
-      html = '<div class="layer-stack">' +
-        '<div class="layer-box tcp"><div class="layer-title">TCP</div><div class="layer-body">順番を管理する番号を付ける</div>' +
-        tcpSegments('') + '</div>' +
-        '<div class="layer-box http"><div class="layer-title">HTTP</div><div class="layer-body">'+request+'</div></div>' +
-        '</div>';
-      exp = '<b>TCP</b> は、データを通信しやすい大きさに分け、1/4、2/4のような順番を管理します。';
-      btn = '宛先IPを付ける';
-    } else if(tcpStep === 2){
-      html = '<div class="layer-stack">' +
-        '<div class="layer-box ip"><div class="layer-title">IP</div><div class="layer-body">'+BROWSER_IP+' → '+LAST_IP+'</div>' +
-        '<div class="layer-box tcp"><div class="layer-title">TCP</div><div class="layer-body">1/4〜4/4の番号付きデータ</div>' +
-        tcpSegments('ip') + '</div></div>' +
-        '</div>';
-      exp = '<b>IP</b> は、DNSで分かった宛先IPアドレスを使って、目的のコンピュータまで届けるための情報を付けます。';
-      btn = 'ネットワークへ送信';
-    } else if(tcpStep === 3){
-      html = '<div class="packet-travel">' +
-        '<div class="travel-node">送信側PC<br><span class="mono">'+BROWSER_IP+'</span></div>' +
-        '<div class="travel-arrow"></div>' +
-        '<div class="travel-node">ルータ1</div>' +
-        '<div class="travel-arrow"></div>' +
-        '<div class="travel-node">ルータ2</div>' +
-        '<div class="travel-arrow"></div>' +
-        '<div class="travel-node">Webサーバ<br><span class="mono">'+LAST_IP+'</span></div>' +
-        '</div>' + tcpSegments('ip');
-      exp = 'ルータは、IPの宛先アドレスを見ながら次の機器へ中継します。今回は経路変更やパケット損失は扱わず、基本の流れに集中します。';
-      btn = '受信データを見る';
-    } else if(tcpStep === 4){
-      html = '<div class="layer-stack">' +
-        '<div class="layer-box ip"><div class="layer-title">受信した順番</div><div class="receive-order">' +
-        '<div class="segment ip">3/4</div><div class="segment ip">1/4</div><div class="segment ip">4/4</div><div class="segment ip">2/4</div>' +
-        '</div></div>' +
-        '<div class="layer-box tcp"><div class="layer-title">TCPで並べ直す</div>' +
-        tcpSegments('') + '</div>' +
-        '</div>';
-      exp = '受信側では、IPの情報を確認したあと、TCPの番号を使って正しい順番に並べ直します。';
-      btn = 'HTTPデータに戻す';
-    } else {
-      html = '<div class="layer-stack">' +
-        '<div class="layer-box http"><div class="layer-title">HTTP</div><div class="layer-body">'+request+'</div></div>' +
-        '<div class="layer-box"><div class="layer-title">復元された内容</div><div class="layer-body">Webサーバが index.html の要求を読み取れる状態</div></div>' +
-        '</div>';
-      exp = '<b>まとめ：</b>送信時はHTTPデータにTCP、IPの情報を付け加え、受信時は逆の順番で取り外して元のデータに戻します。これがカプセル化と復元の基本です。';
-      btn = 'もう一度見る';
+  function clearTcpLayerHighlights(){
+    document.querySelectorAll('.tcp-layer').forEach(function(el){
+      el.classList.remove('active');
+    });
+  }
+
+  function centerInMap(el){
+    var mapRect = $('tcpMap').getBoundingClientRect();
+    var r = el.getBoundingClientRect();
+    return {
+      x: r.left - mapRect.left + r.width/2,
+      y: r.top - mapRect.top + r.height/2
+    };
+  }
+
+  function pointBetween(a, b, ratio){
+    return {x: a.x + (b.x-a.x)*ratio, y: a.y + (b.y-a.y)*ratio};
+  }
+
+  function tcpPoints(){
+    var cNet = centerInMap($('cNet'));
+    var sNet = centerInMap($('sNet'));
+    var cInet = centerInMap($('cInet'));
+    var sInet = centerInMap($('sInet'));
+    var wireMidY = (cNet.y + cInet.y) / 2;
+    var leftEdge = {x: pointBetween(cNet, sNet, .33).x, y: cNet.y};
+    var rightEdge = {x: pointBetween(cNet, sNet, .67).x, y: sNet.y};
+    return {
+      cApp: centerInMap($('cApp')),
+      cTrans: centerInMap($('cTrans')),
+      cInet: cInet,
+      cNet: cNet,
+      r1: {x:leftEdge.x, y:wireMidY},
+      r2: {x:rightEdge.x, y:wireMidY},
+      sNet: sNet,
+      sInet: sInet,
+      sTrans: centerInMap($('sTrans')),
+      sApp: centerInMap($('sApp'))
+    };
+  }
+
+  function placeTcpPacket(pt){
+    $('tcpPacket').style.left = pt.x + 'px';
+    $('tcpPacket').style.top = pt.y + 'px';
+  }
+
+  function animateTcpPacket(from, to, duration, myRun){
+    return new Promise(function(resolve){
+      var elapsed = 0, last = null;
+      function frame(ts){
+        if(myRun !== tcpAnimRun){ resolve(); return; }
+        if(last===null) last = ts;
+        var dt = ts-last; last = ts;
+        if(!PAUSED){ elapsed += dt*SPEED; }
+        var t = Math.min(elapsed/duration, 1);
+        var ease = t < .5 ? 2*t*t : -1 + (4 - 2*t)*t;
+        placeTcpPacket(pointBetween(from, to, ease));
+        if(t<1){ requestAnimationFrame(frame); }
+        else { resolve(); }
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  async function visitTcpPoint(step, myRun){
+    if(myRun !== tcpAnimRun) return false;
+    clearTcpLayerHighlights();
+    if(step.layer){ $(step.layer).classList.add('active'); }
+    $('tcpPacket').innerHTML = step.label;
+    $('tcpPacket').classList.toggle('response', !!step.response);
+    $('tcpExplanation').innerHTML = step.explain;
+    await wait(step.pause || 360);
+    return myRun === tcpAnimRun;
+  }
+
+  async function runTcpFlow(){
+    if(tcpRunning) return;
+    tcpRunning = true;
+    var myRun = ++tcpAnimRun;
+    updateTcpLabels();
+    clearTcpLayerHighlights();
+    $('tcpPlayBtn').disabled = true;
+    $('tcpPlayBtn').textContent = '流れを表示中...';
+    $('tcpPacket').classList.remove('hidden');
+    var p = tcpPoints();
+    var requestPath = [
+      {key:'cApp', layer:'cApp', label:'HTTP<br>GET', explain:'<b>アプリケーション層</b>で、HTTPの「'+LAST_INFO.path+' がほしい」という要求を作ります。'},
+      {key:'cTrans', layer:'cTrans', label:'TCP<br>1/4〜4/4', explain:'<b>トランスポート層</b>で、データを小さく分けて順番の番号を付けます。'},
+      {key:'cInet', layer:'cInet', label:'IP<br>'+LAST_IP, explain:'<b>インターネット層</b>で、DNSで分かった宛先IPアドレスを付けます。'},
+      {key:'cNet', layer:'cNet', label:'0/1<br>信号', explain:'<b>ネットワークインタフェース層</b>で、実際の回線に流せる信号として送り出します。'},
+      {key:'r1', label:'IP<br>中継', explain:'ルータは宛先IPアドレスを見て、次の機器へ中継します。'},
+      {key:'r2', label:'IP<br>中継', explain:'データは複数のルータを通って、Webサーバ側のネットワークへ近づきます。'},
+      {key:'sNet', layer:'sNet', label:'0/1<br>受信', explain:'Webサーバ側のネットワークインタフェース層が信号を受け取ります。'},
+      {key:'sInet', layer:'sInet', label:'IP<br>確認', explain:'IPの宛先を確認し、自分宛てのデータだと判断します。'},
+      {key:'sTrans', layer:'sTrans', label:'TCP<br>並べる', explain:'TCPの番号を見て、分かれていたデータを正しい順番に整えます。'},
+      {key:'sApp', layer:'sApp', label:'HTTP<br>GET', explain:'最後にHTTPデータが取り出され、Webサーバが要求内容を読み取ります。'}
+    ];
+    var responsePath = [
+      {key:'sApp', layer:'sApp', label:'HTTP<br>HTML', response:true, explain:'Webサーバは、要求されたindex.htmlをHTTPの応答として用意します。'},
+      {key:'sTrans', layer:'sTrans', label:'TCP<br>1/4〜4/4', response:true, explain:'応答データもTCPで小さく分けられ、順番の番号が付きます。'},
+      {key:'sInet', layer:'sInet', label:'IP<br>'+BROWSER_IP, response:true, explain:'今度は送信側PCのIPアドレスを宛先として、IPの情報を付けます。'},
+      {key:'sNet', layer:'sNet', label:'0/1<br>信号', response:true, explain:'Webサーバ側からネットワークへ送り出します。'},
+      {key:'r2', label:'IP<br>中継', response:true, explain:'ルータが宛先IPアドレスを見て、ブラウザ側へ中継します。'},
+      {key:'r1', label:'IP<br>中継', response:true, explain:'応答データがブラウザのあるネットワークへ戻っていきます。'},
+      {key:'cNet', layer:'cNet', label:'0/1<br>受信', response:true, explain:'送信側PCのネットワークインタフェース層が応答の信号を受け取ります。'},
+      {key:'cInet', layer:'cInet', label:'IP<br>確認', response:true, explain:'IPの情報を確認し、自分宛てのデータだと分かります。'},
+      {key:'cTrans', layer:'cTrans', label:'TCP<br>復元', response:true, explain:'TCPが番号を使ってHTMLデータを正しい順番に戻します。'},
+      {key:'cApp', layer:'cApp', label:'HTTP<br>HTML', response:true, explain:'HTTPの応答がブラウザへ渡り、Webページ表示につながります。'}
+    ];
+    var steps = requestPath.concat(responsePath);
+    placeTcpPacket(p[steps[0].key]);
+    for(var i=0;i<steps.length;i++){
+      if(!(await visitTcpPoint(steps[i], myRun))) return;
+      if(i < steps.length-1){
+        await animateTcpPacket(p[steps[i].key], p[steps[i+1].key], 620, myRun);
+      }
     }
-    $('tcpWorkspace').innerHTML = html;
-    $('tcpExplanation').innerHTML = exp;
-    $('tcpStepBtn').textContent = btn;
+    clearTcpLayerHighlights();
+    $('tcpExplanation').innerHTML = '<b>まとめ：</b>送信側では上の層から下の層へ進みながら情報を付け加え、ネットワークを通って、受信側では下の層から上の層へ進みながら元のデータを取り出します。';
+    $('tcpPlayBtn').disabled = false;
+    $('tcpPlayBtn').textContent = 'もう一度流す';
+    tcpRunning = false;
+  }
+
+  function resetTcpFlow(){
+    tcpAnimRun++;
+    tcpRunning = false;
+    updateTcpLabels();
+    clearTcpLayerHighlights();
+    $('tcpPacket').classList.add('hidden');
+    $('tcpPacket').classList.remove('response');
+    $('tcpPlayBtn').disabled = false;
+    $('tcpPlayBtn').textContent = '4層の流れを見る';
+    $('tcpExplanation').innerHTML = '<b>流れの見方：</b>送信側PCでアプリケーション層からネットワークインタフェース層へ下がり、ルータを通って、Webサーバ側で下から上へ取り出されます。応答は逆向きに戻ります。';
   }
 
   function setFileActive(type, on){
@@ -979,7 +1046,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     $('goBtn').textContent = 'アクセス';
     LAST_INFO = {domain:"www.school.jp", path:"/index.html", protocol:"https"};
     LAST_IP = "192.0.2.10";
-    setTcpStep(0);
+    resetTcpFlow();
   }
 
   function onResourceComplete(type){
@@ -1159,11 +1226,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   $('webModeBtn').addEventListener('click', function(){ setMode('web'); });
   $('tcpModeBtn').addEventListener('click', function(){ setMode('tcp'); });
   $('backToWebBtn').addEventListener('click', function(){ setMode('web'); });
-  $('tcpResetBtn').addEventListener('click', function(){ setTcpStep(0); });
-  $('tcpStepBtn').addEventListener('click', function(){
-    if(tcpStep >= 5){ setTcpStep(0); }
-    else { setTcpStep(tcpStep + 1); }
-  });
+  $('tcpResetBtn').addEventListener('click', resetTcpFlow);
+  $('tcpPlayBtn').addEventListener('click', runTcpFlow);
   $('urlInput').addEventListener('keydown', function(e){
     if(e.key === 'Enter'){ runSimulation(); }
   });
@@ -1177,7 +1241,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   });
 
   resetAll();
-  renderTcpMode();
+  resetTcpFlow();
 })();
 </script>
 </body>
@@ -1196,6 +1260,8 @@ with st.expander("🧑‍🏫 この教材の使い方（教員・生徒向け�
 - 移動中のパケット（色のついた四角形）を**クリック**すると、送信元IP・送信先IP・データの種類が表示されます。
 - HTML・CSS・画像はそれぞれ複数のパケットに分かれて届きます。ブラウザ画面ではHTMLが届くと文字だけの
   ページが、CSSが届くと色やレイアウトが、画像が届くと写真が段階的に追加される様子を観察してください。
+- **TCP/IP詳細モード**では、同じ通信を4層モデルで表示します。送信側で上から下へ、ネットワークを通って、
+  受信側で下から上へ進むアニメーションから、カプセル化と復元の流れを確認できます。
 - 画面右上の「ℹ️」から、TCPやTLS（HTTPS）についての補足説明を確認できます。
         """
     )
