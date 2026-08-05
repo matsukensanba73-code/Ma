@@ -50,10 +50,6 @@ SIM_HTML = r"""
   --html-c: #6fb7ff;
   --css-c: #45d9ce;
   --img-c: #f5a623;
-  --proto-http: #f5a623;
-  --proto-tcp: #4ade80;
-  --proto-ip: #5eb3ff;
-  --proto-router: #b98ce8;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
@@ -63,6 +59,30 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 .mono{font-family:'JetBrains Mono',monospace;}
 
 /* ---------- layout ---------- */
+.mode-switch{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+}
+.mode-tab{
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  color:var(--muted);
+  border-radius:8px;
+  padding:8px 12px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+.mode-tab.active{
+  background:linear-gradient(135deg,#45d9ce,#6fb7ff);
+  color:#04121a;
+  border-color:transparent;
+}
+.mode-hint{font-size:11px;color:var(--muted-2);}
+.hidden{display:none !important;}
 .stage{
   display:grid;
   grid-template-columns: 300px 1fr 250px;
@@ -301,93 +321,204 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 .log-entry.hl{color:var(--text);}
 .log-empty{color:var(--muted-2); font-style:italic;}
 
-.btn-detail{
-  background:linear-gradient(135deg,#b98ce8,#7c8aff); color:#0b0620; width:100%; margin-top:2px;
-  display:none;
+/* TCP/IP detail mode */
+.tcp-mode{
+  display:grid;
+  grid-template-columns: 260px 1fr 260px;
+  gap:12px;
+  margin-bottom:12px;
 }
-
-/* ================= TCP/IP detail mode ================= */
-.hidden{display:none !important;}
-.detail-mode{margin-top:4px;}
-.detail-header{
-  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
-  margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border);
+.tcp-node{
+  min-height:430px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
-.detail-title{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;}
-.detail-sub{font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:2px;}
-
-.proto-roles{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px;}
-.proto-card{background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:8px 9px; font-size:10.5px; color:var(--muted); line-height:1.5;}
-.proto-card b{display:block; font-size:12px; margin-bottom:3px; font-family:'Space Grotesk',sans-serif;}
-.proto-card.c-http b{color:var(--proto-http);}
-.proto-card.c-tcp b{color:var(--proto-tcp);}
-.proto-card.c-ip b{color:var(--proto-ip);}
-.proto-card.c-router b{color:var(--proto-router);}
-
-.detail-stage{display:grid; grid-template-columns: 300px 1fr 300px; gap:12px; margin-bottom:12px;}
-.role-badge{font-size:10px; color:var(--muted); background:#0c1424; border:1px solid var(--border); border-radius:6px; padding:6px 7px; margin-bottom:10px; line-height:1.6;}
-
-.data-box{background:#0c1424; border:1.5px solid var(--border); border-radius:8px; padding:10px; font-family:'JetBrains Mono',monospace; font-size:12.5px; text-align:center; margin-bottom:10px; transition:all .3s;}
-.http-box{border-color:var(--proto-http); color:var(--proto-http); font-weight:600;}
-.http-box.final{background:rgba(245,166,35,.12); box-shadow:0 0 0 1px var(--proto-http) inset;}
-
-.seg-row{display:flex; gap:5px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;}
-.seg-unit{font-size:8.7px; font-family:'JetBrains Mono',monospace; border-radius:8px; animation:layerPop .3s ease;}
-@keyframes layerPop{from{transform:scale(.8); opacity:0;} to{transform:scale(1); opacity:1;}}
-.layer-ip{border:1.6px solid var(--proto-ip); border-radius:8px; padding:3px; background:rgba(94,179,255,.08);}
-.layer-tcp{border:1.6px solid var(--proto-tcp); border-radius:6px; padding:3px; background:rgba(74,222,128,.08);}
-.layer-http{border:1.6px solid var(--proto-http); border-radius:5px; padding:5px 3px; background:rgba(245,166,35,.12); color:var(--text); text-align:center; font-weight:700;}
-.layer-tag{opacity:.9; margin-bottom:2px; text-align:center; letter-spacing:.02em;}
-.layer-tag.ip{color:var(--proto-ip);}
-.layer-tag.tcp{color:var(--proto-tcp);}
-
-.detail-controls{display:flex; flex-direction:column; gap:7px; margin-top:6px;}
-.detail-controls .btn{width:100%; text-align:left; font-size:12px;}
-.btn:disabled{opacity:.35; cursor:not-allowed; filter:none;}
-.step-hint{font-size:10px; color:var(--muted-2); margin:-3px 0 4px 1px;}
-
-.tray{
-  min-height:64px; background:#0c1424; border:1px dashed var(--border); border-radius:8px;
-  padding:7px; display:flex; gap:6px; flex-wrap:wrap; align-items:flex-start; margin-bottom:8px;
+.tcp-device{
+  background:#0c1424;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px;
+  min-height:94px;
 }
-.tray-empty{color:var(--muted-2); font-size:10px; font-style:italic; margin:auto;}
-
-.dnet-panel svg{width:100%; height:100%; display:block; min-height:230px;}
-.dpacket rect{stroke-width:1.4;}
-.dpacket .r-ip{fill:none; stroke:var(--proto-ip);}
-.dpacket .r-tcp{fill:rgba(74,222,128,.15); stroke:var(--proto-tcp);}
-.dpacket text{font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:#04121a; text-anchor:middle; font-weight:700; pointer-events:none;}
-.dpacket{cursor:default;}
-.dpacket.arrived{opacity:0; transition:opacity .3s ease;}
-
-.explain-box{
-  background:#0c1424; border:1px solid var(--proto-http); border-radius:8px; padding:11px 12px;
-  font-size:11.5px; line-height:1.8; color:var(--text); margin-top:10px; display:none;
+.tcp-device-name{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:5px;
 }
-.explain-box.show{display:block; animation:layerPop .3s ease;}
-
-.flow-summary-panel{margin-top:12px;}
-.flow-summary{display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:11px; margin-top:6px;}
-.flow-chip{
-  background:#0c1424; border:1px solid var(--border); border-radius:20px; padding:5px 10px;
-  color:var(--muted-2); font-family:'JetBrains Mono',monospace; transition:all .3s;
+.tcp-device-ip{
+  font-family:'JetBrains Mono',monospace;
+  color:var(--http);
+  font-size:12px;
 }
-.flow-chip.on{border-color:var(--ok); color:var(--text); box-shadow:0 0 0 1px var(--ok) inset;}
-.flow-arrow{color:var(--muted-2); font-size:11px;}
+.tcp-role{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+}
+.tcp-center{
+  min-height:430px;
+}
+.tcp-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.tcp-actions .btn{padding:8px 10px;}
+.tcp-actions .btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  filter:none;
+}
+.tcp-flow{
+  display:grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap:7px;
+  margin-bottom:12px;
+}
+.tcp-flow-step{
+  background:#0c1424;
+  border:1px solid var(--border);
+  color:var(--muted-2);
+  border-radius:8px;
+  padding:8px 6px;
+  text-align:center;
+  font-size:11px;
+}
+.tcp-flow-step.done{border-color:var(--ok); color:var(--text);}
+.tcp-flow-step.active{
+  border-color:var(--http);
+  color:var(--text);
+  box-shadow:0 0 0 2px rgba(69,217,206,.18) inset;
+}
+.tcp-workspace{
+  background:#081121;
+  border:1px solid var(--border);
+  border-radius:12px;
+  min-height:280px;
+  padding:12px;
+  overflow:hidden;
+}
+.layer-stack{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  min-height:150px;
+  justify-content:center;
+}
+.layer-box{
+  width:min(520px,100%);
+  border:2px solid var(--border);
+  border-radius:10px;
+  padding:10px;
+  background:#0c1424;
+  transition:all .25s ease;
+}
+.layer-box.http{border-color:var(--http);}
+.layer-box.tcp{border-color:var(--ok);}
+.layer-box.ip{border-color:var(--html-c);}
+.layer-title{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.layer-body{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  color:var(--text);
+}
+.segments{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(70px,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+.segment{
+  border:1px solid var(--border);
+  background:#13213a;
+  border-radius:8px;
+  padding:8px 6px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  text-align:center;
+}
+.segment.ip{border-color:var(--html-c);}
+.packet-travel{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-height:84px;
+  margin:14px 0 4px;
+}
+.travel-node{
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:#111a2b;
+  color:var(--muted);
+  padding:8px 10px;
+  font-size:12px;
+  text-align:center;
+  min-width:76px;
+}
+.travel-arrow{
+  flex:1;
+  height:2px;
+  background:linear-gradient(90deg,var(--http),var(--html-c));
+  position:relative;
+}
+.travel-arrow::after{
+  content:'';
+  position:absolute;
+  right:0;
+  top:-4px;
+  border-left:8px solid var(--html-c);
+  border-top:5px solid transparent;
+  border-bottom:5px solid transparent;
+}
+.receive-order{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.tcp-summary{
+  margin-top:12px;
+  background:#0c1424;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.7;
+}
+.tcp-summary b{color:var(--text);}
 
 @media (max-width: 980px){
   .stage{grid-template-columns:1fr;}
+  .tcp-mode{grid-template-columns:1fr;}
+  .tcp-flow{grid-template-columns:1fr 1fr;}
+  .segments{grid-template-columns:1fr 1fr;}
   .browser,.network{grid-row:auto;}
   .bottom{grid-template-columns:1fr;}
-  .detail-stage{grid-template-columns:1fr;}
-  .proto-roles{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="mode-switch">
+    <button class="mode-tab active" id="webModeBtn">Web表示モード</button>
+    <button class="mode-tab" id="tcpModeBtn">TCP/IP詳細モード</button>
+    <span class="mode-hint" id="modeHint">まずはURL入力からWebページ表示までの流れを見ます。</span>
+  </div>
 
-  <div class="stage" id="simpleStage">
+  <div id="webMode">
+  <div class="stage">
     <!-- BROWSER -->
     <div class="panel browser">
       <div class="panel-title"><span class="dot dot-browser"></span>ブラウザ（クライアント）192.168.1.10</div>
@@ -408,9 +539,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
         <button class="btn btn-reset" id="resetBtn" style="margin-left:auto;">リセット</button>
       </div>
       <div class="resolved-ip" id="resolvedIp">名前解決: <span class="mono">まだ通信していません</span></div>
-      <button class="btn btn-detail" id="btnOpenDetail">🔍 TCP/IPを詳しく見る（通信の中身を見る）</button>
       <div class="browser-window">
-
         <div class="browser-chrome">
           <span class="dotc bc1"></span><span class="dotc bc2"></span><span class="dotc bc3"></span>
         </div>
@@ -505,7 +634,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   </div>
 
   <!-- BOTTOM: stepper + log -->
-  <div class="bottom" id="simpleBottom">
+  <div class="bottom">
     <div class="panel">
       <div class="panel-title">処理の流れ</div>
       <ul class="stepper" id="stepper">
@@ -521,100 +650,51 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       <div class="log-box" id="logBox"><div class="log-empty">まだ通信は行われていません。</div></div>
     </div>
   </div>
+  </div>
 
-  <!-- ================= TCP/IP DETAIL MODE ================= -->
-  <div class="detail-mode hidden" id="detailMode">
-    <div class="detail-header">
-      <div>
-        <div class="detail-title">🔍 TCP/IPの仕組みを詳しく見る</div>
-        <div class="detail-sub">今行われている通信: <span id="detailUrlInfo">-</span></div>
+  <div id="tcpMode" class="tcp-mode hidden">
+    <div class="panel tcp-node">
+      <div class="panel-title"><span class="dot dot-browser"></span>送信側PC</div>
+      <div class="tcp-device">
+        <div class="tcp-device-name">ブラウザ</div>
+        <div class="tcp-device-ip" id="tcpClientIp">192.168.1.10</div>
+        <div class="tcp-role">URLを入力したコンピュータ。HTTPで「index.htmlをください」と要求します。</div>
       </div>
-      <div style="display:flex; gap:8px;">
-        <button class="btn btn-ghost" id="btnDetailRestart">🔁 この通信をもう一度見る</button>
-        <button class="btn btn-reset" id="btnBackToSimple">← Web表示シミュレーションに戻る</button>
-      </div>
-    </div>
-
-    <div class="proto-roles">
-      <div class="proto-card c-http"><b>HTTP</b>Webページなどのデータをやり取りするための決まり</div>
-      <div class="proto-card c-tcp"><b>TCP</b>データを適切な大きさに分け、順番などを管理する仕組み</div>
-      <div class="proto-card c-ip"><b>IP</b>IPアドレスを使って、データを目的のコンピュータまで届ける仕組み</div>
-      <div class="proto-card c-router"><b>ルータ</b>宛先IPアドレスをもとに、次の機器へデータを中継する</div>
-    </div>
-
-    <div class="detail-stage">
-      <!-- 送信側PC -->
-      <div class="panel">
-        <div class="panel-title"><span class="dot dot-browser"></span>送信側PC（ブラウザ）</div>
-        <div class="role-badge">HTTP: Webページなどのデータをやり取りするための決まり</div>
-        <div class="data-box http-box" id="dHttpBox">GET /index.html</div>
-        <div class="seg-row" id="dSegRow"></div>
-        <div class="detail-controls">
-          <button class="btn btn-go" id="btnPrepare">① 通信の準備をする</button>
-          <div class="step-hint">→ TCPがデータを分割し、順番の情報を付加します</div>
-          <button class="btn btn-go" id="btnSetDest" disabled>② 宛先を設定する</button>
-          <div class="step-hint">→ DNSで調べたIPアドレスをIP情報として付加します</div>
-          <button class="btn btn-go" id="btnSendNet" disabled>③ ネットワークへ送信</button>
-          <div class="step-hint">→ ルータを経由してWebサーバまでデータが移動します</div>
-        </div>
-      </div>
-
-      <!-- ネットワーク -->
-      <div class="panel dnet-panel">
-        <div class="panel-title"><span class="dot dot-net"></span>ネットワーク（ルータ中継）</div>
-        <div class="role-badge">ルータ: 宛先IPアドレスをもとに、次の機器へデータを中継する</div>
-        <svg id="dNetSvg" viewBox="0 0 640 300" preserveAspectRatio="xMidYMid meet">
-          <path class="route-line" id="dRouteLine" d="M10,150 L200,150 L440,150 L630,150"></path>
-          <g class="node-box">
-            <rect x="170" y="128" width="60" height="44" rx="8"></rect>
-            <text x="200" y="153" class="node-label">🔀</text>
-            <text x="200" y="188" class="node-label">ルータ1</text>
-          </g>
-          <g class="node-box">
-            <rect x="410" y="128" width="60" height="44" rx="8"></rect>
-            <text x="440" y="153" class="node-label">🔀</text>
-            <text x="440" y="188" class="node-label">ルータ2</text>
-          </g>
-          <g id="dPacketsLayer"></g>
-        </svg>
-      </div>
-
-      <!-- Webサーバ -->
-      <div class="panel">
-        <div class="panel-title"><span class="dot dot-web">&nbsp;</span>Webサーバ（受信側）</div>
-        <div class="role-badge">IP宛先: <span id="dDestIpLabel" class="mono">192.0.2.10</span>（DNSで取得したIPアドレス）</div>
-        <div style="font-size:10.5px; color:var(--muted); margin-bottom:4px;">受信トレイ（到着順）</div>
-        <div class="tray" id="dRecvTray"><span class="tray-empty">まだ データは届いていません</span></div>
-        <button class="btn btn-go" id="btnReceive" disabled style="width:100%; margin-bottom:10px;">④ 受信データを見る</button>
-        <div class="data-box http-box" id="dResultBox" style="display:none;">GET /index.html</div>
+      <div class="tcp-summary">
+        <b>送信側の順番</b><br>
+        HTTPデータに、TCPの番号、IPアドレスの情報を順番に付け加えてネットワークへ出します。
       </div>
     </div>
 
-    <div class="panel explain-box" id="dExplainBox">
-      送信時には <b>HTTP → TCP → IP</b> の順に、それぞれの階層で必要な情報を"付け加え"ながらデータを送り出しました（カプセル化）。<br>
-      受信時にはその逆で、<b>IP → TCP → HTTP</b> の順に情報を"取り外し"ながら、元のHTTPデータ（GET /index.html）に復元しました（非カプセル化）。<br>
-      こうしてWebサーバは、届いたデータが何のリクエストかを正しく理解できるようになります。
-    </div>
-
-    <div class="panel flow-summary-panel">
-      <div class="panel-title">通信全体の流れ（DNS〜IP）</div>
-      <div class="flow-summary" id="dFlowSummary">
-        <span class="flow-chip on" id="chipDns">DNS: ドメイン名→IP取得</span>
-        <span class="flow-arrow">→</span>
-        <span class="flow-chip" id="chipHttp">HTTP: Webデータを要求</span>
-        <span class="flow-arrow">→</span>
-        <span class="flow-chip" id="chipTcp">TCP: データを分割・管理</span>
-        <span class="flow-arrow">→</span>
-        <span class="flow-chip" id="chipIp">IP: 宛先まで届ける</span>
-        <span class="flow-arrow">→</span>
-        <span class="flow-chip" id="chipRouter">ルータ: 中継</span>
+    <div class="panel tcp-center">
+      <div class="panel-title"><span class="dot dot-net"></span>通信の中身</div>
+      <div class="tcp-actions">
+        <button class="btn btn-go" id="tcpStepBtn">通信の準備をする</button>
+        <button class="btn btn-reset" id="tcpResetBtn">最初から見る</button>
+        <button class="btn btn-ghost" id="backToWebBtn">Web表示に戻る</button>
       </div>
-      <div class="step-hint" id="dFlowText" style="margin-top:8px;">操作を進めると、ここに一連の流れが表示されます。</div>
+      <div class="tcp-flow" id="tcpFlow">
+        <div class="tcp-flow-step active" data-step="0">HTTP</div>
+        <div class="tcp-flow-step" data-step="1">TCPで分割</div>
+        <div class="tcp-flow-step" data-step="2">IPで宛先設定</div>
+        <div class="tcp-flow-step" data-step="3">ルータを通過</div>
+        <div class="tcp-flow-step" data-step="4">受信側で復元</div>
+      </div>
+      <div class="tcp-workspace" id="tcpWorkspace"></div>
+      <div class="tcp-summary" id="tcpExplanation"></div>
     </div>
 
-    <div class="panel">
-      <div class="panel-title">通信ログ（詳細モード）</div>
-      <div class="log-box" id="detailLogBox"><div class="log-empty">まだ操作していません。上のボタンを①から順に押してください。</div></div>
+    <div class="panel tcp-node">
+      <div class="panel-title"><span class="dot dot-web"></span>Webサーバ</div>
+      <div class="tcp-device">
+        <div class="tcp-device-name" id="tcpServerName">www.school.jp</div>
+        <div class="tcp-device-ip" id="tcpServerIp">192.0.2.10</div>
+        <div class="tcp-role">DNSで調べたIPアドレスを持つ相手。受け取ったデータからHTTPの要求を取り出します。</div>
+      </div>
+      <div class="tcp-summary">
+        <b>受信側の順番</b><br>
+        IPの情報を確認し、TCPの番号を使って順番を整え、最後にHTTPデータを読み取ります。
+      </div>
     </div>
   </div>
 
@@ -635,14 +715,12 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
   var BROWSER_IP = "192.168.1.10";
   var DNS_IP = "203.0.113.53";
+  var LAST_INFO = {domain:"www.school.jp", path:"/index.html", protocol:"https"};
+  var LAST_IP = "192.0.2.10";
+  var tcpStep = 0;
   var DNS_TABLE = {
     "www.school.jp": "192.0.2.10"
   };
-
-  // TCP/IP 詳細モード用: 直近に解決できた通信情報を保持
-  var lastDomain = null, lastIp = null, lastPath = null;
-  var detailRunId = 0;
-  var SEGMENTS = [1,2,3,4];
 
   function $(id){ return document.getElementById(id); }
 
@@ -740,8 +818,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
   }
 
-  function addLog(msg, hl, boxId){
-    var box = $(boxId || 'logBox');
+  function addLog(msg, hl){
+    var box = $('logBox');
     if(box.querySelector('.log-empty')){ box.innerHTML=''; }
     var row = document.createElement('div');
     row.className = 'log-entry' + (hl ? ' hl' : '');
@@ -764,6 +842,105 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   function updateProgress(type, pct){
     $('pf-'+type).style.width = pct+'%';
     $('pp-'+type).textContent = pct+'%';
+  }
+
+  function setMode(mode){
+    var web = mode === 'web';
+    $('webMode').classList.toggle('hidden', !web);
+    $('tcpMode').classList.toggle('hidden', web);
+    $('webModeBtn').classList.toggle('active', web);
+    $('tcpModeBtn').classList.toggle('active', !web);
+    $('modeHint').textContent = web
+      ? 'まずはURL入力からWebページ表示までの流れを見ます。'
+      : 'DNSで分かった同じIPアドレスを使い、HTTP・TCP・IPの働きを詳しく見ます。';
+    if(!web){ renderTcpMode(); }
+  }
+
+  function setTcpStep(n){
+    tcpStep = Math.max(0, Math.min(n, 5));
+    renderTcpMode();
+  }
+
+  function tcpSegments(extraClass){
+    var cls = extraClass ? ' segment '+extraClass : ' segment';
+    return '<div class="segments">' +
+      '<div class="'+cls+'">1/4<br>GET</div>' +
+      '<div class="'+cls+'">2/4<br>index</div>' +
+      '<div class="'+cls+'">3/4<br>.html</div>' +
+      '<div class="'+cls+'">4/4<br>完了</div>' +
+    '</div>';
+  }
+
+  function renderTcpMode(){
+    $('tcpServerName').textContent = LAST_INFO.domain;
+    $('tcpServerIp').textContent = LAST_IP;
+    var flowSteps = document.querySelectorAll('#tcpFlow .tcp-flow-step');
+    flowSteps.forEach(function(el){
+      var n = parseInt(el.getAttribute('data-step'),10);
+      el.classList.remove('done','active');
+      if(n < tcpStep) el.classList.add('done');
+      if(n === Math.min(tcpStep,4)) el.classList.add('active');
+    });
+
+    var request = 'GET ' + LAST_INFO.path;
+    var html = '';
+    var exp = '';
+    var btn = '通信の準備をする';
+    if(tcpStep === 0){
+      html = '<div class="layer-stack">' +
+        '<div class="layer-box http"><div class="layer-title">HTTP</div><div class="layer-body">'+request+'</div></div>' +
+        '</div>';
+      exp = '<b>HTTP</b> は、Webページなどのデータをやり取りするための決まりです。ここでは「index.htmlをください」という要求を作っています。';
+      btn = 'TCPで分ける';
+    } else if(tcpStep === 1){
+      html = '<div class="layer-stack">' +
+        '<div class="layer-box tcp"><div class="layer-title">TCP</div><div class="layer-body">順番を管理する番号を付ける</div>' +
+        tcpSegments('') + '</div>' +
+        '<div class="layer-box http"><div class="layer-title">HTTP</div><div class="layer-body">'+request+'</div></div>' +
+        '</div>';
+      exp = '<b>TCP</b> は、データを通信しやすい大きさに分け、1/4、2/4のような順番を管理します。';
+      btn = '宛先IPを付ける';
+    } else if(tcpStep === 2){
+      html = '<div class="layer-stack">' +
+        '<div class="layer-box ip"><div class="layer-title">IP</div><div class="layer-body">'+BROWSER_IP+' → '+LAST_IP+'</div>' +
+        '<div class="layer-box tcp"><div class="layer-title">TCP</div><div class="layer-body">1/4〜4/4の番号付きデータ</div>' +
+        tcpSegments('ip') + '</div></div>' +
+        '</div>';
+      exp = '<b>IP</b> は、DNSで分かった宛先IPアドレスを使って、目的のコンピュータまで届けるための情報を付けます。';
+      btn = 'ネットワークへ送信';
+    } else if(tcpStep === 3){
+      html = '<div class="packet-travel">' +
+        '<div class="travel-node">送信側PC<br><span class="mono">'+BROWSER_IP+'</span></div>' +
+        '<div class="travel-arrow"></div>' +
+        '<div class="travel-node">ルータ1</div>' +
+        '<div class="travel-arrow"></div>' +
+        '<div class="travel-node">ルータ2</div>' +
+        '<div class="travel-arrow"></div>' +
+        '<div class="travel-node">Webサーバ<br><span class="mono">'+LAST_IP+'</span></div>' +
+        '</div>' + tcpSegments('ip');
+      exp = 'ルータは、IPの宛先アドレスを見ながら次の機器へ中継します。今回は経路変更やパケット損失は扱わず、基本の流れに集中します。';
+      btn = '受信データを見る';
+    } else if(tcpStep === 4){
+      html = '<div class="layer-stack">' +
+        '<div class="layer-box ip"><div class="layer-title">受信した順番</div><div class="receive-order">' +
+        '<div class="segment ip">3/4</div><div class="segment ip">1/4</div><div class="segment ip">4/4</div><div class="segment ip">2/4</div>' +
+        '</div></div>' +
+        '<div class="layer-box tcp"><div class="layer-title">TCPで並べ直す</div>' +
+        tcpSegments('') + '</div>' +
+        '</div>';
+      exp = '受信側では、IPの情報を確認したあと、TCPの番号を使って正しい順番に並べ直します。';
+      btn = 'HTTPデータに戻す';
+    } else {
+      html = '<div class="layer-stack">' +
+        '<div class="layer-box http"><div class="layer-title">HTTP</div><div class="layer-body">'+request+'</div></div>' +
+        '<div class="layer-box"><div class="layer-title">復元された内容</div><div class="layer-body">Webサーバが index.html の要求を読み取れる状態</div></div>' +
+        '</div>';
+      exp = '<b>まとめ：</b>送信時はHTTPデータにTCP、IPの情報を付け加え、受信時は逆の順番で取り外して元のデータに戻します。これがカプセル化と復元の基本です。';
+      btn = 'もう一度見る';
+    }
+    $('tcpWorkspace').innerHTML = html;
+    $('tcpExplanation').innerHTML = exp;
+    $('tcpStepBtn').textContent = btn;
   }
 
   function setFileActive(type, on){
@@ -794,15 +971,15 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     $('pathDns').classList.remove('on');
     $('pathWeb').classList.remove('on');
     $('detailBox').classList.remove('show');
-    lastDomain = null; lastIp = null; lastPath = null;
-    $('btnOpenDetail').style.display = 'none';
-    closeDetailMode();
     var body = $('pageBody');
     body.className = 'browser-body';
     body.innerHTML = '<div class="empty-msg">「アクセス」を押すと、ここにWebページが少しずつ表示されます</div>';
     setStage(0);
     $('goBtn').disabled = false;
     $('goBtn').textContent = 'アクセス';
+    LAST_INFO = {domain:"www.school.jp", path:"/index.html", protocol:"https"};
+    LAST_IP = "192.0.2.10";
+    setTcpStep(0);
   }
 
   function onResourceComplete(type){
@@ -893,6 +1070,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
     setStage(1);
     addLog('入力されたURL: ' + raw);
+    LAST_INFO = info;
     await wait(300);
     if(myRun!==runId) return;
     addLog('URLからドメイン名を抽出しました: <b class="mono">' + info.domain + '</b>');
@@ -916,6 +1094,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     await wait(500);
     if(myRun!==runId) return;
     var ip = DNS_TABLE[info.domain] || hashIp(info.domain);
+    LAST_IP = ip;
     $('pulseDns').classList.remove('on');
     $('dnsServerBox').classList.remove('busy');
     $('dnsLed').classList.remove('blink');
@@ -929,8 +1108,6 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     $('pathDns').classList.remove('on');
     $('resolvedIp').innerHTML = '名前解決: <span class="mono">'+info.domain+' → <b>'+ip+'</b></span>';
     addLog('ブラウザがIPアドレスを取得しました: <b class="mono">'+ip+'</b>', true);
-    lastDomain = info.domain; lastIp = ip; lastPath = info.path;
-    $('btnOpenDetail').style.display = 'block';
     await wait(400);
     if(myRun!==runId) return;
 
@@ -979,6 +1156,14 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
   $('goBtn').addEventListener('click', function(){ runSimulation(); });
   $('resetBtn').addEventListener('click', resetAll);
+  $('webModeBtn').addEventListener('click', function(){ setMode('web'); });
+  $('tcpModeBtn').addEventListener('click', function(){ setMode('tcp'); });
+  $('backToWebBtn').addEventListener('click', function(){ setMode('web'); });
+  $('tcpResetBtn').addEventListener('click', function(){ setTcpStep(0); });
+  $('tcpStepBtn').addEventListener('click', function(){
+    if(tcpStep >= 5){ setTcpStep(0); }
+    else { setTcpStep(tcpStep + 1); }
+  });
   $('urlInput').addEventListener('keydown', function(e){
     if(e.key === 'Enter'){ runSimulation(); }
   });
@@ -992,6 +1177,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   });
 
   resetAll();
+  renderTcpMode();
 })();
 </script>
 </body>
