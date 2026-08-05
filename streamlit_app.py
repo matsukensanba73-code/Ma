@@ -110,7 +110,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 .btn-reset{background:var(--panel-3); color:var(--text); border:1px solid var(--border);}
 .btn-ghost{background:transparent; color:var(--muted); border:1px solid var(--border); font-size:12px; padding:6px 9px;}
 .btn:hover{filter:brightness(1.12);}
-.examples{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;}
+.hint-text{font-size:10.5px; color:var(--muted-2); margin:-2px 0 10px;}
 .controls-row{display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap;}
 .controls-row select{
   background:#0c1424; color:var(--text); border:1px solid var(--border);
@@ -215,6 +215,47 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 /* dns / web server side panels */
 .side{display:flex; flex-direction:column; gap:6px;}
 .side .status-line{font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; min-height:15px;}
+
+/* server rack hardware illustration */
+.server-box{
+  position:relative;
+  background:linear-gradient(180deg,#323f5c,#1a2338 85%);
+  border:1px solid #3a4a6e;
+  border-radius:7px;
+  padding:8px 9px 9px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), inset 0 -6px 10px rgba(0,0,0,.35), 0 3px 8px rgba(0,0,0,.35);
+  transition: box-shadow .25s ease, border-color .25s ease;
+}
+.server-box.busy{
+  border-color: var(--http);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 0 2px rgba(69,217,206,.25), 0 0 14px rgba(69,217,206,.35);
+}
+.server-box .screw{
+  position:absolute; width:4px; height:4px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #dbe2ee, #7c8aa3 55%, #333f5c 100%);
+}
+.server-box .screw.tl{top:4px;left:4px;} .server-box .screw.tr{top:4px;right:4px;}
+.server-box .screw.bl{bottom:4px;left:4px;} .server-box .screw.br{bottom:4px;right:4px;}
+.server-rack{display:flex; flex-direction:column; gap:4px; margin:1px 9px;}
+.server-unit{
+  height:15px; background:#0b1220; border:1px solid #263453; border-radius:3px;
+  display:flex; align-items:center; padding:0 6px; gap:5px;
+}
+.server-unit .vents{
+  flex:1; height:6px; border-radius:2px;
+  background-image:repeating-linear-gradient(90deg, #24314f 0 3px, transparent 3px 6px);
+}
+.server-unit .tag{font-family:'JetBrains Mono',monospace; font-size:7.5px; color:#4a5a80; flex-shrink:0; letter-spacing:.03em;}
+.led{width:6px; height:6px; border-radius:50%; flex-shrink:0; background:#334; box-shadow:none;}
+.led-green{background:#4ade80; box-shadow:0 0 4px #4ade80;}
+.led-amber{background:#f5a623; box-shadow:0 0 4px #f5a623;}
+.led.blink{animation:ledBlink 1.4s ease-in-out infinite;}
+@keyframes ledBlink{0%,100%{opacity:1;} 50%{opacity:.25;}}
+.server-label{
+  display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11px; color:var(--muted);
+}
+.server-label .ip{font-family:'JetBrains Mono',monospace; color:var(--text); font-size:10.5px;}
+.server-label .rack-icon{font-size:14px;}
 .file-list{list-style:none; margin:6px 0 0; padding:0; font-size:11px;}
 .file-list li{
   display:flex; align-items:center; gap:6px; padding:5px 7px; margin-bottom:5px;
@@ -274,12 +315,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
         <input id="urlInput" type="text" value="https://www.school.jp" class="mono" />
         <button class="btn btn-go" id="goBtn">アクセス</button>
       </div>
-      <div class="examples">
-        <button class="btn btn-ghost ex-btn" data-url="https://www.school.jp">school.jp</button>
-        <button class="btn btn-ghost ex-btn" data-url="https://study.school.jp/quiz.html">study.school.jp</button>
-        <button class="btn btn-ghost ex-btn" data-url="https://www.example.jp">example.jp</button>
-        <button class="btn btn-reset" id="resetBtn" style="margin-left:auto;">リセット</button>
-      </div>
+      <div class="hint-text">本校のWebサイト www.school.jp へのアクセスをシミュレートします</div>
       <div class="controls-row">
         <span style="font-size:11px;color:var(--muted);">速度</span>
         <select id="speedSel">
@@ -289,6 +325,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
           <option value="4">最高速 (4x)</option>
         </select>
         <button class="btn btn-ghost" id="pauseBtn">⏸ 一時停止</button>
+        <button class="btn btn-reset" id="resetBtn" style="margin-left:auto;">リセット</button>
       </div>
       <div class="resolved-ip" id="resolvedIp">名前解決: <span class="mono">まだ通信していません</span></div>
       <div class="browser-window">
@@ -351,15 +388,31 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
     <!-- DNS + WEB stacked -->
     <div class="panel side" style="grid-row:1;">
-      <div class="panel-title"><span class="dot dot-dns"></span>DNSサーバ 203.0.113.53</div>
+      <div class="panel-title"><span class="dot dot-dns"></span>DNSサーバ</div>
+      <div class="server-box" id="dnsServerBox">
+        <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+        <div class="server-rack">
+          <div class="server-unit"><span class="led led-green blink"></span><span class="vents"></span><span class="tag">PWR</span></div>
+          <div class="server-unit"><span class="led led-amber" id="dnsLed"></span><span class="vents"></span><span class="tag">QUERY</span></div>
+          <div class="server-unit"><span class="led led-green blink"></span><span class="vents"></span><span class="tag">ZONE</span></div>
+        </div>
+      </div>
+      <div class="server-label"><span class="rack-icon">🗄️</span>dns.school.jp <span class="ip">203.0.113.53</span></div>
       <div class="status-line" id="dnsStatus">待機中...</div>
       <div class="table-row"><span>ドメイン</span><b>IPアドレス</b></div>
       <div class="table-row"><span>www.school.jp</span><b>192.0.2.10</b></div>
-      <div class="table-row"><span>study.school.jp</span><b>192.0.2.30</b></div>
-      <div class="table-row"><span>www.example.jp</span><b>192.0.2.20</b></div>
     </div>
     <div class="panel side" style="grid-row:2;">
       <div class="panel-title"><span class="dot dot-web">&nbsp;</span>Webサーバ</div>
+      <div class="server-box" id="webServerBox">
+        <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+        <div class="server-rack">
+          <div class="server-unit"><span class="led led-green blink"></span><span class="vents"></span><span class="tag">PWR</span></div>
+          <div class="server-unit"><span class="led led-amber" id="webLed"></span><span class="vents"></span><span class="tag">HTTP</span></div>
+          <div class="server-unit"><span class="led led-green blink"></span><span class="vents"></span><span class="tag">DISK</span></div>
+        </div>
+      </div>
+      <div class="server-label"><span class="rack-icon">🖥️</span>www.school.jp <span class="ip" id="webIpLabel">192.0.2.10</span></div>
       <div class="status-line" id="webStatus">待機中...</div>
       <ul class="file-list" id="fileList">
         <li id="file-html">📄 index.html</li>
@@ -405,9 +458,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   var BROWSER_IP = "192.168.1.10";
   var DNS_IP = "203.0.113.53";
   var DNS_TABLE = {
-    "www.school.jp": "192.0.2.10",
-    "study.school.jp": "192.0.2.30",
-    "www.example.jp": "192.0.2.20"
+    "www.school.jp": "192.0.2.10"
   };
 
   function $(id){ return document.getElementById(id); }
@@ -553,6 +604,10 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     $('webStatus').textContent = '待機中...';
     $('pulseDns').classList.remove('on');
     $('pulseWeb').classList.remove('on');
+    $('dnsServerBox').classList.remove('busy');
+    $('webServerBox').classList.remove('busy');
+    $('dnsLed').classList.remove('blink');
+    $('webLed').classList.remove('blink');
     $('pathDns').classList.remove('on');
     $('pathWeb').classList.remove('on');
     $('detailBox').classList.remove('show');
@@ -669,11 +724,15 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     });
     if(myRun!==runId) return;
     $('pulseDns').classList.add('on');
+    $('dnsServerBox').classList.add('busy');
+    $('dnsLed').classList.add('blink');
     addLog('DNSサーバが ' + info.domain + ' を検索しています...');
     await wait(500);
     if(myRun!==runId) return;
     var ip = DNS_TABLE[info.domain] || hashIp(info.domain);
     $('pulseDns').classList.remove('on');
+    $('dnsServerBox').classList.remove('busy');
+    $('dnsLed').classList.remove('blink');
     $('dnsStatus').textContent = info.domain + ' → ' + ip;
     addLog('DNSサーバが変換結果を返送します: <b class="mono">'+info.domain+' → '+ip+'</b>');
     await spawnPacket({
@@ -700,6 +759,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     });
     if(myRun!==runId) return;
     $('pulseWeb').classList.add('on');
+    $('webServerBox').classList.add('busy');
+    $('webLed').classList.add('blink');
     addLog('Webサーバ ('+ip+') へHTTPリクエストが到着しました: GET '+info.path, true);
     await wait(500);
     if(myRun!==runId) return;
@@ -715,6 +776,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     await sendResource('photo.jpg', 'img', 6, ip);
     if(myRun!==runId) return;
     $('pathWeb').classList.remove('on');
+    $('webServerBox').classList.remove('busy');
+    $('webLed').classList.remove('blink');
     $('webStatus').textContent = '送信完了';
 
     // --- 表示完了 ---
@@ -730,11 +793,6 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   $('resetBtn').addEventListener('click', resetAll);
   $('urlInput').addEventListener('keydown', function(e){
     if(e.key === 'Enter'){ runSimulation(); }
-  });
-  document.querySelectorAll('.ex-btn').forEach(function(b){
-    b.addEventListener('click', function(){
-      $('urlInput').value = b.getAttribute('data-url');
-    });
   });
   $('speedSel').addEventListener('change', function(e){ SPEED = parseFloat(e.target.value); });
   $('pauseBtn').addEventListener('click', function(){
