@@ -50,6 +50,10 @@ SIM_HTML = r"""
   --html-c: #6fb7ff;
   --css-c: #45d9ce;
   --img-c: #f5a623;
+  --proto-http: #f5a623;
+  --proto-tcp: #4ade80;
+  --proto-ip: #5eb3ff;
+  --proto-router: #b98ce8;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
@@ -297,17 +301,93 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 .log-entry.hl{color:var(--text);}
 .log-empty{color:var(--muted-2); font-style:italic;}
 
+.btn-detail{
+  background:linear-gradient(135deg,#b98ce8,#7c8aff); color:#0b0620; width:100%; margin-top:2px;
+  display:none;
+}
+
+/* ================= TCP/IP detail mode ================= */
+.hidden{display:none !important;}
+.detail-mode{margin-top:4px;}
+.detail-header{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border);
+}
+.detail-title{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;}
+.detail-sub{font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:2px;}
+
+.proto-roles{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px;}
+.proto-card{background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:8px 9px; font-size:10.5px; color:var(--muted); line-height:1.5;}
+.proto-card b{display:block; font-size:12px; margin-bottom:3px; font-family:'Space Grotesk',sans-serif;}
+.proto-card.c-http b{color:var(--proto-http);}
+.proto-card.c-tcp b{color:var(--proto-tcp);}
+.proto-card.c-ip b{color:var(--proto-ip);}
+.proto-card.c-router b{color:var(--proto-router);}
+
+.detail-stage{display:grid; grid-template-columns: 300px 1fr 300px; gap:12px; margin-bottom:12px;}
+.role-badge{font-size:10px; color:var(--muted); background:#0c1424; border:1px solid var(--border); border-radius:6px; padding:6px 7px; margin-bottom:10px; line-height:1.6;}
+
+.data-box{background:#0c1424; border:1.5px solid var(--border); border-radius:8px; padding:10px; font-family:'JetBrains Mono',monospace; font-size:12.5px; text-align:center; margin-bottom:10px; transition:all .3s;}
+.http-box{border-color:var(--proto-http); color:var(--proto-http); font-weight:600;}
+.http-box.final{background:rgba(245,166,35,.12); box-shadow:0 0 0 1px var(--proto-http) inset;}
+
+.seg-row{display:flex; gap:5px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;}
+.seg-unit{font-size:8.7px; font-family:'JetBrains Mono',monospace; border-radius:8px; animation:layerPop .3s ease;}
+@keyframes layerPop{from{transform:scale(.8); opacity:0;} to{transform:scale(1); opacity:1;}}
+.layer-ip{border:1.6px solid var(--proto-ip); border-radius:8px; padding:3px; background:rgba(94,179,255,.08);}
+.layer-tcp{border:1.6px solid var(--proto-tcp); border-radius:6px; padding:3px; background:rgba(74,222,128,.08);}
+.layer-http{border:1.6px solid var(--proto-http); border-radius:5px; padding:5px 3px; background:rgba(245,166,35,.12); color:var(--text); text-align:center; font-weight:700;}
+.layer-tag{opacity:.9; margin-bottom:2px; text-align:center; letter-spacing:.02em;}
+.layer-tag.ip{color:var(--proto-ip);}
+.layer-tag.tcp{color:var(--proto-tcp);}
+
+.detail-controls{display:flex; flex-direction:column; gap:7px; margin-top:6px;}
+.detail-controls .btn{width:100%; text-align:left; font-size:12px;}
+.btn:disabled{opacity:.35; cursor:not-allowed; filter:none;}
+.step-hint{font-size:10px; color:var(--muted-2); margin:-3px 0 4px 1px;}
+
+.tray{
+  min-height:64px; background:#0c1424; border:1px dashed var(--border); border-radius:8px;
+  padding:7px; display:flex; gap:6px; flex-wrap:wrap; align-items:flex-start; margin-bottom:8px;
+}
+.tray-empty{color:var(--muted-2); font-size:10px; font-style:italic; margin:auto;}
+
+.dnet-panel svg{width:100%; height:100%; display:block; min-height:230px;}
+.dpacket rect{stroke-width:1.4;}
+.dpacket .r-ip{fill:none; stroke:var(--proto-ip);}
+.dpacket .r-tcp{fill:rgba(74,222,128,.15); stroke:var(--proto-tcp);}
+.dpacket text{font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:#04121a; text-anchor:middle; font-weight:700; pointer-events:none;}
+.dpacket{cursor:default;}
+.dpacket.arrived{opacity:0; transition:opacity .3s ease;}
+
+.explain-box{
+  background:#0c1424; border:1px solid var(--proto-http); border-radius:8px; padding:11px 12px;
+  font-size:11.5px; line-height:1.8; color:var(--text); margin-top:10px; display:none;
+}
+.explain-box.show{display:block; animation:layerPop .3s ease;}
+
+.flow-summary-panel{margin-top:12px;}
+.flow-summary{display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:11px; margin-top:6px;}
+.flow-chip{
+  background:#0c1424; border:1px solid var(--border); border-radius:20px; padding:5px 10px;
+  color:var(--muted-2); font-family:'JetBrains Mono',monospace; transition:all .3s;
+}
+.flow-chip.on{border-color:var(--ok); color:var(--text); box-shadow:0 0 0 1px var(--ok) inset;}
+.flow-arrow{color:var(--muted-2); font-size:11px;}
+
 @media (max-width: 980px){
   .stage{grid-template-columns:1fr;}
   .browser,.network{grid-row:auto;}
   .bottom{grid-template-columns:1fr;}
+  .detail-stage{grid-template-columns:1fr;}
+  .proto-roles{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="stage">
+  <div class="stage" id="simpleStage">
     <!-- BROWSER -->
     <div class="panel browser">
       <div class="panel-title"><span class="dot dot-browser"></span>ブラウザ（クライアント）192.168.1.10</div>
@@ -328,7 +408,9 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
         <button class="btn btn-reset" id="resetBtn" style="margin-left:auto;">リセット</button>
       </div>
       <div class="resolved-ip" id="resolvedIp">名前解決: <span class="mono">まだ通信していません</span></div>
+      <button class="btn btn-detail" id="btnOpenDetail">🔍 TCP/IPを詳しく見る（通信の中身を見る）</button>
       <div class="browser-window">
+
         <div class="browser-chrome">
           <span class="dotc bc1"></span><span class="dotc bc2"></span><span class="dotc bc3"></span>
         </div>
@@ -423,7 +505,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   </div>
 
   <!-- BOTTOM: stepper + log -->
-  <div class="bottom">
+  <div class="bottom" id="simpleBottom">
     <div class="panel">
       <div class="panel-title">処理の流れ</div>
       <ul class="stepper" id="stepper">
@@ -437,6 +519,102 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     <div class="panel">
       <div class="panel-title">通信ログ</div>
       <div class="log-box" id="logBox"><div class="log-empty">まだ通信は行われていません。</div></div>
+    </div>
+  </div>
+
+  <!-- ================= TCP/IP DETAIL MODE ================= -->
+  <div class="detail-mode hidden" id="detailMode">
+    <div class="detail-header">
+      <div>
+        <div class="detail-title">🔍 TCP/IPの仕組みを詳しく見る</div>
+        <div class="detail-sub">今行われている通信: <span id="detailUrlInfo">-</span></div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost" id="btnDetailRestart">🔁 この通信をもう一度見る</button>
+        <button class="btn btn-reset" id="btnBackToSimple">← Web表示シミュレーションに戻る</button>
+      </div>
+    </div>
+
+    <div class="proto-roles">
+      <div class="proto-card c-http"><b>HTTP</b>Webページなどのデータをやり取りするための決まり</div>
+      <div class="proto-card c-tcp"><b>TCP</b>データを適切な大きさに分け、順番などを管理する仕組み</div>
+      <div class="proto-card c-ip"><b>IP</b>IPアドレスを使って、データを目的のコンピュータまで届ける仕組み</div>
+      <div class="proto-card c-router"><b>ルータ</b>宛先IPアドレスをもとに、次の機器へデータを中継する</div>
+    </div>
+
+    <div class="detail-stage">
+      <!-- 送信側PC -->
+      <div class="panel">
+        <div class="panel-title"><span class="dot dot-browser"></span>送信側PC（ブラウザ）</div>
+        <div class="role-badge">HTTP: Webページなどのデータをやり取りするための決まり</div>
+        <div class="data-box http-box" id="dHttpBox">GET /index.html</div>
+        <div class="seg-row" id="dSegRow"></div>
+        <div class="detail-controls">
+          <button class="btn btn-go" id="btnPrepare">① 通信の準備をする</button>
+          <div class="step-hint">→ TCPがデータを分割し、順番の情報を付加します</div>
+          <button class="btn btn-go" id="btnSetDest" disabled>② 宛先を設定する</button>
+          <div class="step-hint">→ DNSで調べたIPアドレスをIP情報として付加します</div>
+          <button class="btn btn-go" id="btnSendNet" disabled>③ ネットワークへ送信</button>
+          <div class="step-hint">→ ルータを経由してWebサーバまでデータが移動します</div>
+        </div>
+      </div>
+
+      <!-- ネットワーク -->
+      <div class="panel dnet-panel">
+        <div class="panel-title"><span class="dot dot-net"></span>ネットワーク（ルータ中継）</div>
+        <div class="role-badge">ルータ: 宛先IPアドレスをもとに、次の機器へデータを中継する</div>
+        <svg id="dNetSvg" viewBox="0 0 640 300" preserveAspectRatio="xMidYMid meet">
+          <path class="route-line" id="dRouteLine" d="M10,150 L200,150 L440,150 L630,150"></path>
+          <g class="node-box">
+            <rect x="170" y="128" width="60" height="44" rx="8"></rect>
+            <text x="200" y="153" class="node-label">🔀</text>
+            <text x="200" y="188" class="node-label">ルータ1</text>
+          </g>
+          <g class="node-box">
+            <rect x="410" y="128" width="60" height="44" rx="8"></rect>
+            <text x="440" y="153" class="node-label">🔀</text>
+            <text x="440" y="188" class="node-label">ルータ2</text>
+          </g>
+          <g id="dPacketsLayer"></g>
+        </svg>
+      </div>
+
+      <!-- Webサーバ -->
+      <div class="panel">
+        <div class="panel-title"><span class="dot dot-web">&nbsp;</span>Webサーバ（受信側）</div>
+        <div class="role-badge">IP宛先: <span id="dDestIpLabel" class="mono">192.0.2.10</span>（DNSで取得したIPアドレス）</div>
+        <div style="font-size:10.5px; color:var(--muted); margin-bottom:4px;">受信トレイ（到着順）</div>
+        <div class="tray" id="dRecvTray"><span class="tray-empty">まだ データは届いていません</span></div>
+        <button class="btn btn-go" id="btnReceive" disabled style="width:100%; margin-bottom:10px;">④ 受信データを見る</button>
+        <div class="data-box http-box" id="dResultBox" style="display:none;">GET /index.html</div>
+      </div>
+    </div>
+
+    <div class="panel explain-box" id="dExplainBox">
+      送信時には <b>HTTP → TCP → IP</b> の順に、それぞれの階層で必要な情報を"付け加え"ながらデータを送り出しました（カプセル化）。<br>
+      受信時にはその逆で、<b>IP → TCP → HTTP</b> の順に情報を"取り外し"ながら、元のHTTPデータ（GET /index.html）に復元しました（非カプセル化）。<br>
+      こうしてWebサーバは、届いたデータが何のリクエストかを正しく理解できるようになります。
+    </div>
+
+    <div class="panel flow-summary-panel">
+      <div class="panel-title">通信全体の流れ（DNS〜IP）</div>
+      <div class="flow-summary" id="dFlowSummary">
+        <span class="flow-chip on" id="chipDns">DNS: ドメイン名→IP取得</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-chip" id="chipHttp">HTTP: Webデータを要求</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-chip" id="chipTcp">TCP: データを分割・管理</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-chip" id="chipIp">IP: 宛先まで届ける</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-chip" id="chipRouter">ルータ: 中継</span>
+      </div>
+      <div class="step-hint" id="dFlowText" style="margin-top:8px;">操作を進めると、ここに一連の流れが表示されます。</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">通信ログ（詳細モード）</div>
+      <div class="log-box" id="detailLogBox"><div class="log-empty">まだ操作していません。上のボタンを①から順に押してください。</div></div>
     </div>
   </div>
 
@@ -460,6 +638,11 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   var DNS_TABLE = {
     "www.school.jp": "192.0.2.10"
   };
+
+  // TCP/IP 詳細モード用: 直近に解決できた通信情報を保持
+  var lastDomain = null, lastIp = null, lastPath = null;
+  var detailRunId = 0;
+  var SEGMENTS = [1,2,3,4];
 
   function $(id){ return document.getElementById(id); }
 
@@ -557,8 +740,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
   }
 
-  function addLog(msg, hl){
-    var box = $('logBox');
+  function addLog(msg, hl, boxId){
+    var box = $(boxId || 'logBox');
     if(box.querySelector('.log-empty')){ box.innerHTML=''; }
     var row = document.createElement('div');
     row.className = 'log-entry' + (hl ? ' hl' : '');
@@ -611,6 +794,9 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     $('pathDns').classList.remove('on');
     $('pathWeb').classList.remove('on');
     $('detailBox').classList.remove('show');
+    lastDomain = null; lastIp = null; lastPath = null;
+    $('btnOpenDetail').style.display = 'none';
+    closeDetailMode();
     var body = $('pageBody');
     body.className = 'browser-body';
     body.innerHTML = '<div class="empty-msg">「アクセス」を押すと、ここにWebページが少しずつ表示されます</div>';
@@ -743,6 +929,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     $('pathDns').classList.remove('on');
     $('resolvedIp').innerHTML = '名前解決: <span class="mono">'+info.domain+' → <b>'+ip+'</b></span>';
     addLog('ブラウザがIPアドレスを取得しました: <b class="mono">'+ip+'</b>', true);
+    lastDomain = info.domain; lastIp = ip; lastPath = info.path;
+    $('btnOpenDetail').style.display = 'block';
     await wait(400);
     if(myRun!==runId) return;
 
