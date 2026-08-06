@@ -630,12 +630,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 .mini-signal-bit.one{background:#7f1d1d;}
 .mini-signal-bit.zero{background:#17217d;}
 .mini-signal-wave{
-  position:absolute;
-  left:0;
-  right:0;
-  top:1px;
-  width:100%;
-  height:15px;
+  display:none;
 }
 .mini-signal-wave path{
   fill:none;
