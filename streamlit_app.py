@@ -668,8 +668,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   white-space:normal;
 }
 .tcp-payload-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
+  display:flex;
+  flex-direction:column;
   gap:6px;
   margin-top:8px;
 }
@@ -682,6 +682,21 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   min-height:48px;
   font-family:'JetBrains Mono',monospace;
   color:#152033;
+}
+.ip-packet-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.ip-packet-item{
+  background:#dcefff;
+  border:2px solid rgba(4,18,26,.26);
+  border-radius:6px;
+  padding:7px;
+  box-shadow:4px 4px 0 rgba(0,0,0,.12);
+}
+.ip-packet-item .proto-row{
+  font-size:10px;
 }
 .tcp-piece-head{
   display:flex;
@@ -1247,6 +1262,20 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
         '</div>';
     }
     tcpPieces += '</div>';
+    var ipPackets = '<div class="ip-packet-list">';
+    for(var ii=0; ii<4; ii++){
+      ipPackets +=
+        '<div class="ip-packet-item">' +
+          '<div class="proto-head"><span>IPv4</span><span>パケット '+(ii+1)+'/4</span></div>' +
+          '<div class="proto-row"><span>送信元IP</span><b>'+escapeHtml(dir.src)+'</b></div>' +
+          '<div class="proto-row"><span>宛先IP</span><b>'+escapeHtml(dir.dst)+'</b></div>' +
+          '<div class="tcp-piece">' +
+            '<div class="tcp-piece-head"><span>TCP</span><span>'+(ii+1)+'/4</span></div>' +
+            '<div class="tcp-piece-body">'+escapeHtml(parts[ii])+'</div>' +
+          '</div>' +
+        '</div>';
+    }
+    ipPackets += '</div>';
     var tcpBox =
       '<div class="proto-box tcp-box">' +
         '<div class="proto-head"><span>TCP</span><span>4分割</span></div>' +
@@ -1256,10 +1285,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       '</div>';
     var ipBox =
       '<div class="proto-box ip-box">' +
-        '<div class="proto-head"><span>IPv4</span><span>宛先つき</span></div>' +
-        '<div class="proto-row"><span>送信元IP</span><b>'+escapeHtml(dir.src)+'</b></div>' +
-        '<div class="proto-row"><span>宛先IP</span><b>'+escapeHtml(dir.dst)+'</b></div>' +
-        tcpBox +
+        '<div class="proto-head"><span>IPv4</span><span>それぞれに宛先つき</span></div>' +
+        ipPackets +
       '</div>';
 
     if(kind === 'ip'){
