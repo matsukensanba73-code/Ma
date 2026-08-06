@@ -590,6 +590,29 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   background:#f5a623;
   border-color:#f5a623;
 }
+.tcp-mini-packet.signal{
+  width:92px;
+  min-height:34px;
+  background:#020617;
+  border-color:#1f2937;
+  color:#e5e7eb;
+  padding:3px;
+}
+.tcp-mini-packet.signal .pkt-ip,
+.tcp-mini-packet.signal .pkt-tcp{
+  display:none;
+}
+.tcp-mini-packet.signal .pkt-body{
+  background:
+    linear-gradient(90deg, #7f1d1d 0 18%, #17217d 18% 54%, #7f1d1d 54% 74%, #17217d 74% 100%);
+  border:0;
+  color:rgba(255,255,255,.86);
+  font-size:11px;
+  letter-spacing:3px;
+  line-height:26px;
+  min-height:26px;
+  padding:0 3px;
+}
 .pkt-ip,.pkt-tcp,.pkt-body{
   border-radius:5px;
   padding:2px 4px;
@@ -796,31 +819,43 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   gap:10px;
 }
 .signal-row{
-  height:34px;
+  height:40px;
   border-radius:3px;
   overflow:hidden;
-  background:
-    linear-gradient(90deg, #7f1d1d 0 18%, #17217d 18% 54%, #7f1d1d 54% 74%, #17217d 74% 100%);
+  background:#020617;
   color:rgba(255,255,255,.82);
   font-family:'JetBrains Mono',monospace;
-  font-size:16px;
-  letter-spacing:9px;
+  position:relative;
+}
+.signal-bits{
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:repeat(8, 1fr);
+}
+.signal-bit{
   display:flex;
   align-items:flex-end;
   justify-content:center;
-  padding-bottom:4px;
-  position:relative;
+  padding-bottom:3px;
+  font-size:15px;
+  color:rgba(255,255,255,.82);
 }
-.signal-row::before{
-  content:'';
-  position:absolute;
-  left:0;
-  right:0;
-  top:2px;
-  height:15px;
-  background:
-    radial-gradient(ellipse at 8px 9px, transparent 0 5px, rgba(255,255,255,.82) 5px 6px, transparent 6px) 0 0/26px 15px repeat-x;
-  opacity:.9;
+.signal-bit.one{background:#7f1d1d;}
+.signal-bit.zero{background:#17217d;}
+.signal-wave{
+  position:relative;
+  z-index:2;
+  width:100%;
+  height:20px;
+  display:block;
+  margin-top:2px;
+}
+.signal-wave path{
+  fill:none;
+  stroke:#fff;
+  stroke-width:2;
+  opacity:.92;
 }
 .detail-note{
   color:#dbe7ff;
@@ -1446,11 +1481,12 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       el.classList.toggle('has-tcp', !!step.tcp);
       el.classList.toggle('has-ip', !!step.ip);
       el.classList.toggle('response', !!step.response);
+      el.classList.toggle('signal', !!step.signal);
       el.querySelector('.pkt-ip').textContent = step.response ? 'IP → '+BROWSER_IP : 'IP → '+LAST_IP;
       el.querySelector('.pkt-tcp').textContent = 'TCP '+(i+1)+'/4';
       el.querySelector('.pkt-body').innerHTML = single && i === 0
         ? step.label
-        : (step.response ? 'HTML '+(i+1)+'/4' : pieces[i]+' '+(i+1)+'/4');
+        : (step.signal ? ['11100011','10000011','10010111','10101101'][i] : (step.response ? 'HTML '+(i+1)+'/4' : pieces[i]+' '+(i+1)+'/4'));
     });
   }
 
@@ -1493,6 +1529,21 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     return String(s).replace(/[&<>"']/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
+  }
+
+  function signalRowHtml(bits){
+    var html = '<div class="signal-row">' +
+      '<div class="signal-bits">';
+    for(var i=0; i<bits.length; i++){
+      var bit = bits.charAt(i);
+      html += '<div class="signal-bit '+(bit === '1' ? 'one' : 'zero')+'">'+bit+'</div>';
+    }
+    html += '</div>' +
+      '<svg class="signal-wave" viewBox="0 0 240 24" preserveAspectRatio="none" aria-hidden="true">' +
+        '<path d="M0 12 C5 2 10 2 15 12 S25 22 30 12 S40 2 45 12 S55 22 60 12 S70 2 75 12 S85 22 90 12 S100 2 105 12 S115 22 120 12 S130 2 135 12 S145 22 150 12 S160 2 165 12 S175 22 180 12 S190 2 195 12 S205 22 210 12 S220 2 225 12 S235 22 240 12" />' +
+      '</svg>' +
+    '</div>';
+    return html;
   }
 
   function currentDataKind(step){
@@ -1567,7 +1618,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     var signalRows = ['11100011', '10000011', '10010111', '11100011', '10000011', '10101101', '11100011', '10010000'];
     var signalBox = '<div class="signal-list">';
     for(var si=0; si<signalRows.length; si++){
-      signalBox += '<div class="signal-row">'+signalRows[si]+'</div>';
+      signalBox += signalRowHtml(signalRows[si]);
     }
     signalBox += '</div>';
 
@@ -1640,10 +1691,10 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       {key:'cApp', layer:'cApp', form:'single', label:'HTTP<br>GET '+LAST_INFO.path, snapshot:'HTTPデータを作成', snapKind:'single', explain:'<b>アプリケーション層</b>で、HTTPの「'+LAST_INFO.path+' がほしい」という1つのデータを作ります。'},
       {key:'cTrans', layer:'cTrans', tcp:true, label:'TCP', snapshot:'TCPを追加・4分割', snapKind:'tcp', explain:'<b>トランスポート層</b>で、1つのデータを4つに分け、TCP 1/4〜4/4の番号を付けます。'},
       {key:'cInet', layer:'cInet', tcp:true, ip:true, label:'IP', snapshot:'IPを外側に追加', snapKind:'ip', explain:'<b>インターネット層</b>で、それぞれの外側に宛先IPアドレスを付けます。'},
-      {key:'cNet', layer:'cNet', tcp:true, ip:true, label:'0/1', snapshot:'回線へ送信', snapKind:'signal', detailKind:'signal', explain:'<b>ネットワークインタフェース層</b>で、4つのパケットを0と1の信号として実際の回線へ送り出します。'},
-      {key:'r1', tcp:true, ip:true, label:'中継', explain:'4つのパケットが少しずつずれてルータ1を通過します。ルータはIPの宛先を見ます。'},
-      {key:'r2', tcp:true, ip:true, label:'中継', explain:'パケットは同じ通信の一部ですが、1/4〜4/4のように小さな単位で移動します。'},
-      {key:'sNet', layer:'sNet', tcp:true, ip:true, label:'受信', snapshot:'回線から受信', snapKind:'signal', detailKind:'signal', explain:'Webサーバ側のネットワークインタフェース層が0と1の信号を受け取ります。'},
+      {key:'cNet', layer:'cNet', tcp:true, ip:true, signal:true, label:'0/1', snapshot:'回線へ送信', snapKind:'signal', detailKind:'signal', explain:'<b>ネットワークインタフェース層</b>で、4つのパケットを0と1の信号として実際の回線へ送り出します。'},
+      {key:'r1', tcp:true, ip:true, signal:true, detailKind:'signal', label:'0/1', explain:'ネットワークを通っている間も、データは0と1の信号として流れます。'},
+      {key:'r2', tcp:true, ip:true, signal:true, detailKind:'signal', label:'0/1', explain:'ルータ間でも、実際に流れているものは0と1の信号です。'},
+      {key:'sNet', layer:'sNet', tcp:true, ip:true, signal:true, label:'受信', snapshot:'回線から受信', snapKind:'signal', detailKind:'signal', explain:'Webサーバ側のネットワークインタフェース層が0と1の信号を受け取ります。'},
       {key:'sInet', layer:'sInet', tcp:true, ip:true, label:'IP確認', snapshot:'IPを確認して外す', snapKind:'tcp', explain:'IPの外側の情報を確認し、自分宛てのパケットだと判断します。ここでIPの情報は役目を終えます。'},
       {key:'sTrans', layer:'sTrans', tcp:true, label:'TCP確認', snapshot:'TCP番号で復元', snapKind:'single', explain:'TCPの番号を使って、分かれていたデータを正しい順番に整えます。ここでTCPの情報は役目を終えます。'},
       {key:'sApp', layer:'sApp', form:'single', label:'HTTP<br>GET '+LAST_INFO.path, snapshot:'HTTPデータを取得', snapKind:'single', explain:'最後にHTTPデータが取り出され、Webサーバが要求内容を読み取ります。'}
@@ -1652,10 +1703,10 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       {key:'sApp', layer:'sApp', form:'single', label:'HTTP<br>HTML応答', response:true, snapshot:'HTTP応答を作成', snapKind:'single', explain:'Webサーバは、要求されたindex.htmlをHTTPの応答として用意します。'},
       {key:'sTrans', layer:'sTrans', tcp:true, response:true, label:'TCP', snapshot:'TCPを追加・4分割', snapKind:'tcp', explain:'応答データもTCPで4つに分けられ、順番の番号が付きます。'},
       {key:'sInet', layer:'sInet', tcp:true, ip:true, response:true, label:'IP', snapshot:'IPを外側に追加', snapKind:'ip', explain:'今度は送信側PCのIPアドレスを宛先として、IPの情報を外側に付けます。'},
-      {key:'sNet', layer:'sNet', tcp:true, ip:true, response:true, label:'0/1', snapshot:'回線へ送信', snapKind:'signal', detailKind:'signal', explain:'Webサーバ側から、応答データを0と1の信号としてネットワークへ送り出します。'},
-      {key:'rb2', tcp:true, ip:true, response:true, label:'中継', explain:'応答パケットは行きとは違う上側の経路でルータ2を通過します。'},
-      {key:'rb1', tcp:true, ip:true, response:true, label:'中継', explain:'帰り道では、ルータが宛先IPアドレスを見てブラウザ側へ中継します。'},
-      {key:'cNet', layer:'cNet', tcp:true, ip:true, response:true, label:'受信', snapshot:'回線から受信', snapKind:'signal', detailKind:'signal', explain:'送信側PCのネットワークインタフェース層が、戻ってきた0と1の信号を受け取ります。'},
+      {key:'sNet', layer:'sNet', tcp:true, ip:true, signal:true, response:true, label:'0/1', snapshot:'回線へ送信', snapKind:'signal', detailKind:'signal', explain:'Webサーバ側から、応答データを0と1の信号としてネットワークへ送り出します。'},
+      {key:'rb2', tcp:true, ip:true, signal:true, response:true, detailKind:'signal', label:'0/1', explain:'応答データも、ネットワークを通っている間は0と1の信号として流れます。'},
+      {key:'rb1', tcp:true, ip:true, signal:true, response:true, detailKind:'signal', label:'0/1', explain:'帰り道でも、ルータ間を流れるものは0と1の信号です。'},
+      {key:'cNet', layer:'cNet', tcp:true, ip:true, signal:true, response:true, label:'受信', snapshot:'回線から受信', snapKind:'signal', detailKind:'signal', explain:'送信側PCのネットワークインタフェース層が、戻ってきた0と1の信号を受け取ります。'},
       {key:'cInet', layer:'cInet', tcp:true, ip:true, response:true, label:'IP確認', snapshot:'IPを確認して外す', snapKind:'tcp', explain:'IPの情報を確認し、自分宛てのパケットだと分かります。ここでIPの情報は取り外されます。'},
       {key:'cTrans', layer:'cTrans', tcp:true, response:true, label:'TCP復元', snapshot:'TCP番号で復元', snapKind:'single', explain:'TCPが1/4〜4/4の番号を使ってHTMLデータを正しい順番に戻します。'},
       {key:'cApp', layer:'cApp', form:'single', label:'HTTP<br>HTML応答', response:true, snapshot:'ブラウザへ渡す', snapKind:'single', explain:'HTTPの応答がブラウザへ渡り、Webページ表示につながります。'}
