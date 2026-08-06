@@ -780,13 +780,101 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 @media (max-width: 980px){
   .stage{grid-template-columns:1fr;}
   .tcp-mode{grid-template-columns:1fr;}
-  .tcp-map-grid{grid-template-columns:1fr; grid-template-rows:auto; height:auto;}
-  .tcp-wire{grid-column:auto; grid-row:auto; min-height:120px;}
-  .tcp-map{min-height:760px;}
-  .layer-snapshot{position:static; transform:none; width:auto; margin-top:7px;}
+  .tcp-map{
+    min-height:520px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+  .tcp-map-grid{
+    min-width:680px;
+    grid-template-columns: 1fr 120px 1fr;
+    grid-template-rows: 38px repeat(4, 92px);
+    gap:6px;
+    height:auto;
+  }
+  .tcp-head{font-size:10px;}
+  .tcp-head b{font-size:12px;}
+  .tcp-layer{padding:7px 8px;}
+  .tcp-layer .lname{font-size:12px;}
+  .tcp-layer .ldata{font-size:10px;}
+  .tcp-wire{grid-row:2/6; grid-column:2; min-height:0;}
+  .router-chain{flex-direction:column; width:auto; height:72%; gap:10px;}
+  .router{
+    flex:0 0 auto;
+    width:82px;
+    padding:8px 6px;
+    font-size:11px;
+  }
+  .router-line{
+    width:2px;
+    height:44px;
+    flex:0 0 44px;
+  }
+  .router-line::after{
+    right:auto;
+    left:-4px;
+    top:auto;
+    bottom:0;
+    border-left:5px solid transparent;
+    border-right:5px solid transparent;
+    border-top:8px solid #304365;
+    border-bottom:0;
+  }
+  .layer-snapshot{width:58px;}
+  [id^="snap-c"]{left:6px;}
+  [id^="snap-s"]{right:6px;}
+  [id^="snapret-c"]{right:6px;}
+  [id^="snapret-s"]{left:6px;}
+  .snapshot-pkt{min-width:18px; min-height:22px;}
+  .snapshot-pkt.single{min-width:42px;}
+  .tcp-mini-packet{
+    width:82px;
+    min-height:42px;
+    font-size:9px;
+  }
+  .tcp-mini-packet.single{
+    width:98px;
+    min-height:40px;
+  }
   .tcp-legend{grid-template-columns:1fr 1fr;}
   .browser,.network{grid-row:auto;}
   .bottom{grid-template-columns:1fr;}
+}
+
+@media (max-width: 560px){
+  .wrap{padding:10px 8px 16px;}
+  .panel{padding:10px; border-radius:10px;}
+  .mode-switch{gap:6px;}
+  .mode-tab{font-size:12px; padding:8px 9px; flex:1 1 130px;}
+  .mode-hint{width:100%; line-height:1.45;}
+  .addr-row{flex-direction:column;}
+  .addr-row input{font-size:12px;}
+  .controls-row .btn,
+  .tcp-actions .btn{
+    flex:1 1 120px;
+    min-height:38px;
+  }
+  .browser-window{min-height:210px;}
+  .network svg{min-height:260px;}
+  .stepper{flex-wrap:wrap; row-gap:8px;}
+  .stepper li{flex:1 1 33%; font-size:9.5px;}
+  .log-box{height:120px;}
+  .tcp-map{
+    min-height:500px;
+    padding:8px;
+  }
+  .tcp-map-grid{
+    min-width:620px;
+    grid-template-columns: 1fr 104px 1fr;
+    grid-template-rows: 34px repeat(4, 88px);
+  }
+  .tcp-actions{gap:6px;}
+  .tcp-legend{grid-template-columns:1fr;}
+  .data-detail-panel{min-height:auto;}
+  .data-box-stage{max-height:420px; overflow:auto;}
+  .proto-head{font-size:11px;}
+  .proto-row{font-size:10px;}
 }
 </style>
 </head>
