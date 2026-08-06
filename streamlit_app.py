@@ -403,8 +403,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   position:absolute;
   top:50%;
   transform:translateY(-50%);
-  width:118px;
-  min-height:34px;
+  width:92px;
+  min-height:30px;
   margin:0;
   display:flex;
   gap:4px;
@@ -423,43 +423,49 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 }
 .snapshot-pkt{
   position:relative;
-  min-width:24px;
-  min-height:20px;
+  min-width:22px;
+  min-height:26px;
   border-radius:4px;
   border:1px solid rgba(255,255,255,.25);
-  background:rgba(69,217,206,.42);
-  color:var(--text);
+  background:
+    linear-gradient(90deg, #f58be9 0 5px, transparent 5px),
+    repeating-conic-gradient(rgba(255,255,255,.70) 0 25%, rgba(10,15,28,.18) 0 50%) 0 0/8px 8px,
+    rgba(255,255,255,.18);
+  color:transparent;
   font-family:'JetBrains Mono',monospace;
-  font-size:8px;
-  line-height:1.15;
-  padding:3px;
-  opacity:.72;
+  font-size:0;
+  line-height:0;
+  padding:0;
+  opacity:.64;
+  overflow:hidden;
 }
 .snapshot-pkt.single{
-  min-width:72px;
+  min-width:58px;
 }
 .snapshot-pkt.response{
-  background:rgba(245,166,35,.46);
+  background:
+    linear-gradient(90deg, #f58be9 0 5px, transparent 5px),
+    repeating-conic-gradient(rgba(255,255,255,.70) 0 25%, rgba(10,15,28,.18) 0 50%) 0 0/8px 8px,
+    rgba(245,166,35,.20);
 }
 .snapshot-pkt.tcp{
-  border-left:5px solid #4ade80;
+  background:
+    linear-gradient(90deg, #ffd7a3 0 5px, #f58be9 5px 10px, transparent 10px),
+    repeating-conic-gradient(rgba(255,255,255,.70) 0 25%, rgba(10,15,28,.18) 0 50%) 0 0/8px 8px,
+    rgba(255,255,255,.18);
 }
 .snapshot-pkt.ip{
-  border-left:5px solid #6fb7ff;
-  border-top:5px solid rgba(111,183,255,.60);
+  background:
+    linear-gradient(90deg, #9ed8ff 0 5px, #ffd7a3 5px 10px, #f58be9 10px 15px, transparent 15px),
+    repeating-conic-gradient(rgba(255,255,255,.70) 0 25%, rgba(10,15,28,.18) 0 50%) 0 0/8px 8px,
+    rgba(255,255,255,.18);
 }
 .snapshot-pkt.removed{
   background:rgba(139,160,196,.20);
   border-style:dashed;
 }
 .snapshot-label{
-  width:100%;
-  color:var(--muted-2);
-  font-size:9px;
-  margin-bottom:1px;
-}
-[id^="snap-s"] .snapshot-label{
-  text-align:right;
+  display:none;
 }
 .tcp-wire{
   grid-row:2/6;
