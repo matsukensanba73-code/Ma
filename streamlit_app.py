@@ -603,15 +603,44 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   display:none;
 }
 .tcp-mini-packet.signal .pkt-body{
-  background:
-    linear-gradient(90deg, #7f1d1d 0 18%, #17217d 18% 54%, #7f1d1d 54% 74%, #17217d 74% 100%);
+  background:#020617;
   border:0;
   color:rgba(255,255,255,.86);
-  font-size:11px;
-  letter-spacing:3px;
-  line-height:26px;
+  font-size:9px;
+  letter-spacing:0;
+  line-height:1;
   min-height:26px;
-  padding:0 3px;
+  padding:0;
+  overflow:hidden;
+  position:relative;
+}
+.mini-signal-bits{
+  display:grid;
+  grid-template-columns:repeat(8, 1fr);
+  min-height:26px;
+}
+.mini-signal-bit{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:2px;
+  color:rgba(255,255,255,.86);
+}
+.mini-signal-bit.one{background:#7f1d1d;}
+.mini-signal-bit.zero{background:#17217d;}
+.mini-signal-wave{
+  position:absolute;
+  left:0;
+  right:0;
+  top:1px;
+  width:100%;
+  height:15px;
+}
+.mini-signal-wave path{
+  fill:none;
+  stroke:#fff;
+  stroke-width:2;
+  opacity:.92;
 }
 .pkt-ip,.pkt-tcp,.pkt-body{
   border-radius:5px;
@@ -1474,6 +1503,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
   function configureTcpPackets(step){
     var pieces = ['GET', '/index', '.html', '完了'];
+    var signalPieces = ['11100011','10000011','10010111','10101101'];
     var single = step.form === 'single';
     tcpPacketEls().forEach(function(el, i){
       el.classList.toggle('single', single);
@@ -1486,7 +1516,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       el.querySelector('.pkt-tcp').textContent = 'TCP '+(i+1)+'/4';
       el.querySelector('.pkt-body').innerHTML = single && i === 0
         ? step.label
-        : (step.signal ? ['11100011','10000011','10010111','10101101'][i] : (step.response ? 'HTML '+(i+1)+'/4' : pieces[i]+' '+(i+1)+'/4'));
+        : (step.signal ? miniSignalHtml(signalPieces[i]) : (step.response ? 'HTML '+(i+1)+'/4' : pieces[i]+' '+(i+1)+'/4'));
     });
   }
 
@@ -1529,6 +1559,19 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     return String(s).replace(/[&<>"']/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
+  }
+
+  function miniSignalHtml(bits){
+    var html = '<div class="mini-signal-bits">';
+    for(var i=0; i<bits.length; i++){
+      var bit = bits.charAt(i);
+      html += '<div class="mini-signal-bit '+(bit === '1' ? 'one' : 'zero')+'">'+bit+'</div>';
+    }
+    html += '</div>' +
+      '<svg class="mini-signal-wave" viewBox="0 0 160 20" preserveAspectRatio="none" aria-hidden="true">' +
+        '<path d="M0 10 C4 2 8 2 12 10 S20 18 24 10 S32 2 36 10 S44 18 48 10 S56 2 60 10 S68 18 72 10 S80 2 84 10 S92 18 96 10 S104 2 108 10 S116 18 120 10 S128 2 132 10 S140 18 144 10 S156 18 160 10" />' +
+      '</svg>';
+    return html;
   }
 
   function signalRowHtml(bits){
