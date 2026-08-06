@@ -600,7 +600,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 }
 .tcp-mini-packet.signal .pkt-ip,
 .tcp-mini-packet.signal .pkt-tcp{
-  display:none;
+  display:none !important;
 }
 .tcp-mini-packet.signal .pkt-body{
   background:#020617;
@@ -610,6 +610,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   letter-spacing:0;
   line-height:1;
   min-height:26px;
+  height:100%;
   padding:0;
   overflow:hidden;
   position:relative;
@@ -617,7 +618,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 .mini-signal-bits{
   display:grid;
   grid-template-columns:repeat(8, 1fr);
-  min-height:26px;
+  min-height:100%;
 }
 .mini-signal-bit{
   display:flex;
