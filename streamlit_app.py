@@ -323,7 +323,9 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
 /* TCP/IP detail mode */
 .tcp-mode{
-  display:block;
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) 310px;
+  gap:12px;
   margin-bottom:12px;
 }
 .tcp-actions{
@@ -588,9 +590,93 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   line-height:1.7;
 }
 .tcp-summary b{color:var(--text);}
+.data-detail-panel{
+  min-height:540px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.detail-status{
+  background:#0c1424;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:9px 10px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.55;
+}
+.detail-status b{color:var(--text);}
+.data-box-stage{
+  flex:1;
+  background:linear-gradient(180deg,#9c6a36,#70451f);
+  border:1px solid #bd8b4f;
+  border-radius:10px;
+  padding:14px 12px;
+  box-shadow:inset -12px -12px 0 rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.24);
+}
+.data-box-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;
+  font-size:14px;
+  color:#fff5df;
+  margin-bottom:10px;
+  text-align:center;
+}
+.proto-box{
+  border:2px solid rgba(4,18,26,.32);
+  border-radius:6px;
+  background:rgba(255,255,255,.88);
+  color:#152033;
+  padding:9px;
+  margin-bottom:9px;
+  box-shadow:6px 6px 0 rgba(0,0,0,.16);
+}
+.proto-box.ip-box{background:#dcefff;}
+.proto-box.tcp-box{background:#e7f8ed;}
+.proto-box.http-box{background:#fff;}
+.proto-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:7px;
+}
+.proto-row{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  border-top:1px solid rgba(4,18,26,.14);
+  padding-top:5px;
+  margin-top:5px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+}
+.proto-row span:first-child{color:#526078;}
+.proto-row b{color:#111827;}
+.payload-lines{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  line-height:1.55;
+  background:#f4f6f8;
+  border:1px solid #d7dde7;
+  border-radius:4px;
+  padding:7px;
+  color:#111827;
+  white-space:normal;
+}
+.detail-note{
+  color:#dbe7ff;
+  font-size:11px;
+  line-height:1.55;
+  margin-top:10px;
+}
 
 @media (max-width: 980px){
   .stage{grid-template-columns:1fr;}
+  .tcp-mode{grid-template-columns:1fr;}
   .tcp-map-grid{grid-template-columns:1fr; grid-template-rows:auto; height:auto;}
   .tcp-wire{grid-column:auto; grid-row:auto; min-height:120px;}
   .tcp-map{min-height:760px;}
@@ -790,6 +876,25 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
         <div class="legend-card"><b>ネットワークI/F</b><span>実際の回線へ流せる信号にする。</span></div>
       </div>
       <div class="tcp-summary" id="tcpExplanation"></div>
+    </div>
+    <div class="panel data-detail-panel">
+      <div class="panel-title"><span class="dot dot-web"></span>流れたデータ</div>
+      <div class="detail-status" id="dataDetailStatus">
+        <b>待機中</b><br>
+        「4層の流れを見る」を押すと、現在流れているデータの中身がここに表示されます。
+      </div>
+      <div class="data-box-stage">
+        <div class="data-box-title">データの中身</div>
+        <div id="dataDetailBox">
+          <div class="proto-box http-box">
+            <div class="proto-head"><span>HTTP</span><span>待機中</span></div>
+            <div class="payload-lines">GET /index.html</div>
+          </div>
+        </div>
+        <div class="detail-note" id="dataDetailNote">
+          層を通るたびに、外側へTCPやIPの情報が追加されます。受信側では外側から順に確認して取り外します。
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1061,6 +1166,70 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     el.innerHTML = '<div class="snapshot-label">'+title+'</div>' + snapshotPieces(kind, response);
   }
 
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function currentDataKind(step){
+    if(step.detailKind) return step.detailKind;
+    if(step.snapKind) return step.snapKind;
+    if(step.ip) return 'ip';
+    if(step.tcp) return 'tcp';
+    return 'single';
+  }
+
+  function detailDirection(step){
+    return step.response
+      ? {src: LAST_IP, dst: BROWSER_IP, body:'HTML応答', app:'HTTP/1.1 200 OK'}
+      : {src: BROWSER_IP, dst: LAST_IP, body:'GET '+LAST_INFO.path, app:'GET '+LAST_INFO.path};
+  }
+
+  function updateDataDetail(step){
+    var kind = currentDataKind(step);
+    var dir = detailDirection(step);
+    var phase = step.detailTitle || step.snapshot || '通信中';
+    var body = escapeHtml(dir.body);
+    var app = escapeHtml(dir.app);
+    var directionLabel = step.response ? 'Webサーバ → ブラウザ' : 'ブラウザ → Webサーバ';
+    $('dataDetailStatus').innerHTML =
+      '<b>'+escapeHtml(phase)+'</b><br>' +
+      escapeHtml(directionLabel) + '<br>' +
+      '<span class="mono">'+escapeHtml(dir.src)+' → '+escapeHtml(dir.dst)+'</span>';
+
+    var httpBox =
+      '<div class="proto-box http-box">' +
+        '<div class="proto-head"><span>HTTP</span><span>中身</span></div>' +
+        '<div class="payload-lines">'+app+'<br>'+body+'</div>' +
+      '</div>';
+    var tcpBox =
+      '<div class="proto-box tcp-box">' +
+        '<div class="proto-head"><span>TCP</span><span>4分割</span></div>' +
+        '<div class="proto-row"><span>パケット番号</span><b>1/4〜4/4</b></div>' +
+        '<div class="proto-row"><span>役割</span><b>順番を管理</b></div>' +
+        httpBox +
+      '</div>';
+    var ipBox =
+      '<div class="proto-box ip-box">' +
+        '<div class="proto-head"><span>IPv4</span><span>宛先つき</span></div>' +
+        '<div class="proto-row"><span>送信元IP</span><b>'+escapeHtml(dir.src)+'</b></div>' +
+        '<div class="proto-row"><span>宛先IP</span><b>'+escapeHtml(dir.dst)+'</b></div>' +
+        tcpBox +
+      '</div>';
+
+    if(kind === 'ip'){
+      $('dataDetailBox').innerHTML = ipBox;
+      $('dataDetailNote').textContent = '外側のIP箱に宛先IPアドレスが入っています。ルータは主にこの宛先IPを見て中継します。';
+    } else if(kind === 'tcp'){
+      $('dataDetailBox').innerHTML = tcpBox;
+      $('dataDetailNote').textContent = 'IPの情報は確認済みです。TCPの番号を使って、分かれたデータを正しい順番に扱います。';
+    } else {
+      $('dataDetailBox').innerHTML = httpBox;
+      $('dataDetailNote').textContent = 'まだTCPやIPの外側の箱はありません。Web通信の中身であるHTTPデータだけが見えています。';
+    }
+  }
+
   function animateTcpPackets(from, to, duration, myRun, clustered){
     return new Promise(function(resolve){
       var finished = 0;
@@ -1095,6 +1264,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     if(step.layer){ $(step.layer).classList.add('active'); }
     configureTcpPackets(step);
     if(step.snapshot){ writeSnapshot(step.layer, step.snapshot, step.snapKind || 'single', !!step.response); }
+    updateDataDetail(step);
     $('tcpExplanation').innerHTML = step.explain;
     await wait(step.pause || 360);
     return myRun === tcpAnimRun;
@@ -1162,6 +1332,13 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     });
     $('tcpPlayBtn').disabled = false;
     $('tcpPlayBtn').textContent = '4層の流れを見る';
+    $('dataDetailStatus').innerHTML = '<b>待機中</b><br>「4層の流れを見る」を押すと、現在流れているデータの中身がここに表示されます。';
+    $('dataDetailBox').innerHTML =
+      '<div class="proto-box http-box">' +
+        '<div class="proto-head"><span>HTTP</span><span>待機中</span></div>' +
+        '<div class="payload-lines">GET /index.html</div>' +
+      '</div>';
+    $('dataDetailNote').textContent = '層を通るたびに、外側へTCPやIPの情報が追加されます。受信側では外側から順に確認して取り外します。';
     $('tcpExplanation').innerHTML = '<b>流れの見方：</b>動くパケットは控えめに流れます。各層に残る小さな履歴を見ると、TCPやIPの情報がどこで追加され、どこで取り外されたか確認できます。';
   }
 
