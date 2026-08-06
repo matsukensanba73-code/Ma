@@ -838,27 +838,84 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     min-height:40px;
   }
   .tcp-legend{grid-template-columns:1fr 1fr;}
-  .browser,.network{grid-row:auto;}
+  .browser,.network,.side{grid-row:auto !important;}
   .bottom{grid-template-columns:1fr;}
 }
 
 @media (max-width: 560px){
   .wrap{padding:10px 8px 16px;}
   .panel{padding:10px; border-radius:10px;}
+  .stage{gap:8px; margin-bottom:8px;}
   .mode-switch{gap:6px;}
   .mode-tab{font-size:12px; padding:8px 9px; flex:1 1 130px;}
   .mode-hint{width:100%; line-height:1.45;}
   .addr-row{flex-direction:column;}
   .addr-row input{font-size:12px;}
+  .addr-row .btn{width:100%; min-height:40px;}
+  .hint-text{font-size:10px; line-height:1.45;}
+  .controls-row{
+    display:grid;
+    grid-template-columns:auto 1fr 1fr;
+    gap:6px;
+  }
+  .controls-row select{min-width:0; width:100%; font-size:11px;}
   .controls-row .btn,
   .tcp-actions .btn{
     flex:1 1 120px;
     min-height:38px;
+    margin-left:0 !important;
   }
-  .browser-window{min-height:210px;}
-  .network svg{min-height:260px;}
+  .resolved-ip{font-size:10px; overflow-wrap:anywhere;}
+  .browser-window{min-height:220px;}
+  .browser-body{padding:11px;}
+  .browser-body .empty-msg{margin-top:42px; font-size:11px; line-height:1.6;}
+  .page-h1{font-size:18px;}
+  .browser-body.styled .page-h1{font-size:17px; padding:13px 14px;}
+  .page-p{font-size:12px;}
+  .browser-body.styled .page-p{padding:0 14px;}
+  .browser-body.styled .page-list{
+    flex-wrap:wrap;
+    gap:8px;
+    padding:9px 14px;
+  }
+  .hero-img{height:72px; margin:10px 14px;}
+  .img-caption{padding:0 14px 12px;}
+  .progress-group{gap:6px;}
+  .prow{gap:6px;}
+  .prow .plabel{width:34px; font-size:10px;}
+  .ppct{width:30px; font-size:10px;}
+  .network{
+    min-height:300px;
+    padding:8px 4px 4px;
+  }
+  .network svg{min-height:280px;}
+  .tcp-note{top:8px; right:8px;}
+  .tcp-note .note-body{
+    width:min(230px, calc(100vw - 54px));
+    font-size:10px;
+  }
+  .detail-box{
+    left:8px;
+    right:8px;
+    bottom:8px;
+    font-size:10px;
+  }
+  .side{
+    min-height:0;
+  }
+  .server-box{padding:7px 8px;}
+  .server-label{
+    flex-wrap:wrap;
+    line-height:1.35;
+  }
+  .table-row{
+    gap:8px;
+    overflow-wrap:anywhere;
+  }
+  .file-list li{font-size:10px;}
   .stepper{flex-wrap:wrap; row-gap:8px;}
   .stepper li{flex:1 1 33%; font-size:9.5px;}
+  .stepper li::before{display:none;}
   .log-box{height:120px;}
   .tcp-map{
     min-height:500px;
