@@ -938,6 +938,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       <div class="panel-title"><span class="dot dot-net"></span>通信の中身</div>
       <div class="tcp-actions">
         <button class="btn btn-go" id="tcpPlayBtn">4層の流れを見る</button>
+        <button class="btn btn-ghost" id="tcpPauseBtn">⏸ 一時停止</button>
         <button class="btn btn-reset" id="tcpResetBtn">最初から見る</button>
         <button class="btn btn-ghost" id="backToWebBtn">Web表示に戻る</button>
       </div>
@@ -1147,6 +1148,16 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   function updateProgress(type, pct){
     $('pf-'+type).style.width = pct+'%';
     $('pp-'+type).textContent = pct+'%';
+  }
+
+  function updatePauseButtons(){
+    $('pauseBtn').textContent = PAUSED ? '▶ 再開' : '⏸ 一時停止';
+    $('tcpPauseBtn').textContent = PAUSED ? '▶ 再開' : '⏸ 一時停止';
+  }
+
+  function togglePause(){
+    PAUSED = !PAUSED;
+    updatePauseButtons();
   }
 
   function setMode(mode){
@@ -1462,6 +1473,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   function resetTcpFlow(){
     tcpAnimRun++;
     tcpRunning = false;
+    PAUSED = false;
+    updatePauseButtons();
     updateTcpLabels();
     clearTcpLayerHighlights();
     clearSnapshots();
@@ -1699,14 +1712,12 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   $('backToWebBtn').addEventListener('click', function(){ setMode('web'); });
   $('tcpResetBtn').addEventListener('click', resetTcpFlow);
   $('tcpPlayBtn').addEventListener('click', runTcpFlow);
+  $('tcpPauseBtn').addEventListener('click', togglePause);
   $('urlInput').addEventListener('keydown', function(e){
     if(e.key === 'Enter'){ runSimulation(); }
   });
   $('speedSel').addEventListener('change', function(e){ SPEED = parseFloat(e.target.value); });
-  $('pauseBtn').addEventListener('click', function(){
-    PAUSED = !PAUSED;
-    $('pauseBtn').textContent = PAUSED ? '▶ 再開' : '⏸ 一時停止';
-  });
+  $('pauseBtn').addEventListener('click', togglePause);
   document.getElementById('netSvg').addEventListener('click', function(){
     $('detailBox').classList.remove('show');
   });
