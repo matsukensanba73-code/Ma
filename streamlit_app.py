@@ -473,6 +473,22 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     repeating-conic-gradient(rgba(255,255,255,.70) 0 25%, rgba(10,15,28,.18) 0 50%) 0 0/8px 8px,
     rgba(255,255,255,.18);
 }
+.snapshot-pkt.signal{
+  min-width:62px;
+  background:
+    linear-gradient(90deg, #7f1d1d 0 14%, #17217d 14% 38%, #7f1d1d 38% 52%, #17217d 52% 76%, #7f1d1d 76% 100%);
+  border-color:rgba(255,255,255,.20);
+}
+.snapshot-pkt.signal::after{
+  content:'10110010';
+  position:absolute;
+  inset:0;
+  color:rgba(255,255,255,.78);
+  font-size:8px;
+  line-height:26px;
+  letter-spacing:2px;
+  text-align:center;
+}
 .snapshot-pkt.removed{
   background:rgba(139,160,196,.20);
   border-style:dashed;
@@ -769,6 +785,42 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   padding:4px;
   font-size:10px;
   line-height:1.35;
+}
+.signal-list{
+  background:#020617;
+  border:2px solid #111827;
+  border-radius:6px;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.signal-row{
+  height:34px;
+  border-radius:3px;
+  overflow:hidden;
+  background:
+    linear-gradient(90deg, #7f1d1d 0 18%, #17217d 18% 54%, #7f1d1d 54% 74%, #17217d 74% 100%);
+  color:rgba(255,255,255,.82);
+  font-family:'JetBrains Mono',monospace;
+  font-size:16px;
+  letter-spacing:9px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:4px;
+  position:relative;
+}
+.signal-row::before{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  top:2px;
+  height:15px;
+  background:
+    radial-gradient(ellipse at 8px 9px, transparent 0 5px, rgba(255,255,255,.82) 5px 6px, transparent 6px) 0 0/26px 15px repeat-x;
+  opacity:.9;
 }
 .detail-note{
   color:#dbe7ff;
@@ -1512,8 +1564,17 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
         '<div class="proto-head"><span>IPv4</span><span>それぞれに宛先つき</span></div>' +
         ipPackets +
       '</div>';
+    var signalRows = ['11100011', '10000011', '10010111', '11100011', '10000011', '10101101', '11100011', '10010000'];
+    var signalBox = '<div class="signal-list">';
+    for(var si=0; si<signalRows.length; si++){
+      signalBox += '<div class="signal-row">'+signalRows[si]+'</div>';
+    }
+    signalBox += '</div>';
 
-    if(kind === 'ip'){
+    if(kind === 'signal'){
+      $('dataDetailBox').innerHTML = signalBox;
+      $('dataDetailNote').textContent = 'ネットワークインタフェース層では、データを実際に流せる0と1の信号として扱います。';
+    } else if(kind === 'ip'){
       $('dataDetailBox').innerHTML = ipBox;
       $('dataDetailNote').textContent = '外側のIP箱に宛先IPアドレスが入っています。ルータは主にこの宛先IPを見て中継します。';
     } else if(kind === 'tcp'){
@@ -1579,10 +1640,10 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       {key:'cApp', layer:'cApp', form:'single', label:'HTTP<br>GET '+LAST_INFO.path, snapshot:'HTTPデータを作成', snapKind:'single', explain:'<b>アプリケーション層</b>で、HTTPの「'+LAST_INFO.path+' がほしい」という1つのデータを作ります。'},
       {key:'cTrans', layer:'cTrans', tcp:true, label:'TCP', snapshot:'TCPを追加・4分割', snapKind:'tcp', explain:'<b>トランスポート層</b>で、1つのデータを4つに分け、TCP 1/4〜4/4の番号を付けます。'},
       {key:'cInet', layer:'cInet', tcp:true, ip:true, label:'IP', snapshot:'IPを外側に追加', snapKind:'ip', explain:'<b>インターネット層</b>で、それぞれの外側に宛先IPアドレスを付けます。'},
-      {key:'cNet', layer:'cNet', tcp:true, ip:true, label:'0/1', snapshot:'回線へ送信', snapKind:'ip', explain:'<b>ネットワークインタフェース層</b>で、4つのパケットを実際の回線へ少しずつ送り出します。'},
+      {key:'cNet', layer:'cNet', tcp:true, ip:true, label:'0/1', snapshot:'回線へ送信', snapKind:'signal', detailKind:'signal', explain:'<b>ネットワークインタフェース層</b>で、4つのパケットを0と1の信号として実際の回線へ送り出します。'},
       {key:'r1', tcp:true, ip:true, label:'中継', explain:'4つのパケットが少しずつずれてルータ1を通過します。ルータはIPの宛先を見ます。'},
       {key:'r2', tcp:true, ip:true, label:'中継', explain:'パケットは同じ通信の一部ですが、1/4〜4/4のように小さな単位で移動します。'},
-      {key:'sNet', layer:'sNet', tcp:true, ip:true, label:'受信', snapshot:'回線から受信', snapKind:'ip', explain:'Webサーバ側のネットワークインタフェース層が4つのパケットを受け取ります。'},
+      {key:'sNet', layer:'sNet', tcp:true, ip:true, label:'受信', snapshot:'回線から受信', snapKind:'signal', detailKind:'signal', explain:'Webサーバ側のネットワークインタフェース層が0と1の信号を受け取ります。'},
       {key:'sInet', layer:'sInet', tcp:true, ip:true, label:'IP確認', snapshot:'IPを確認して外す', snapKind:'tcp', explain:'IPの外側の情報を確認し、自分宛てのパケットだと判断します。ここでIPの情報は役目を終えます。'},
       {key:'sTrans', layer:'sTrans', tcp:true, label:'TCP確認', snapshot:'TCP番号で復元', snapKind:'single', explain:'TCPの番号を使って、分かれていたデータを正しい順番に整えます。ここでTCPの情報は役目を終えます。'},
       {key:'sApp', layer:'sApp', form:'single', label:'HTTP<br>GET '+LAST_INFO.path, snapshot:'HTTPデータを取得', snapKind:'single', explain:'最後にHTTPデータが取り出され、Webサーバが要求内容を読み取ります。'}
@@ -1591,10 +1652,10 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       {key:'sApp', layer:'sApp', form:'single', label:'HTTP<br>HTML応答', response:true, snapshot:'HTTP応答を作成', snapKind:'single', explain:'Webサーバは、要求されたindex.htmlをHTTPの応答として用意します。'},
       {key:'sTrans', layer:'sTrans', tcp:true, response:true, label:'TCP', snapshot:'TCPを追加・4分割', snapKind:'tcp', explain:'応答データもTCPで4つに分けられ、順番の番号が付きます。'},
       {key:'sInet', layer:'sInet', tcp:true, ip:true, response:true, label:'IP', snapshot:'IPを外側に追加', snapKind:'ip', explain:'今度は送信側PCのIPアドレスを宛先として、IPの情報を外側に付けます。'},
-      {key:'sNet', layer:'sNet', tcp:true, ip:true, response:true, label:'0/1', snapshot:'回線へ送信', snapKind:'ip', explain:'Webサーバ側から4つのパケットをネットワークへ送り出します。'},
+      {key:'sNet', layer:'sNet', tcp:true, ip:true, response:true, label:'0/1', snapshot:'回線へ送信', snapKind:'signal', detailKind:'signal', explain:'Webサーバ側から、応答データを0と1の信号としてネットワークへ送り出します。'},
       {key:'rb2', tcp:true, ip:true, response:true, label:'中継', explain:'応答パケットは行きとは違う上側の経路でルータ2を通過します。'},
       {key:'rb1', tcp:true, ip:true, response:true, label:'中継', explain:'帰り道では、ルータが宛先IPアドレスを見てブラウザ側へ中継します。'},
-      {key:'cNet', layer:'cNet', tcp:true, ip:true, response:true, label:'受信', snapshot:'回線から受信', snapKind:'ip', explain:'送信側PCのネットワークインタフェース層が4つの応答パケットを受け取ります。'},
+      {key:'cNet', layer:'cNet', tcp:true, ip:true, response:true, label:'受信', snapshot:'回線から受信', snapKind:'signal', detailKind:'signal', explain:'送信側PCのネットワークインタフェース層が、戻ってきた0と1の信号を受け取ります。'},
       {key:'cInet', layer:'cInet', tcp:true, ip:true, response:true, label:'IP確認', snapshot:'IPを確認して外す', snapKind:'tcp', explain:'IPの情報を確認し、自分宛てのパケットだと分かります。ここでIPの情報は取り外されます。'},
       {key:'cTrans', layer:'cTrans', tcp:true, response:true, label:'TCP復元', snapshot:'TCP番号で復元', snapKind:'single', explain:'TCPが1/4〜4/4の番号を使ってHTMLデータを正しい順番に戻します。'},
       {key:'cApp', layer:'cApp', form:'single', label:'HTTP<br>HTML応答', response:true, snapshot:'ブラウザへ渡す', snapKind:'single', explain:'HTTPの応答がブラウザへ渡り、Webページ表示につながります。'}
