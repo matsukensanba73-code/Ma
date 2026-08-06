@@ -479,6 +479,24 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   justify-content:center;
   color:var(--muted);
 }
+.tcp-wire::before,
+.tcp-wire::after{
+  content:'';
+  position:absolute;
+  left:8%;
+  right:8%;
+  height:2px;
+  border-radius:2px;
+  opacity:.55;
+}
+.tcp-wire::before{
+  top:38%;
+  background:linear-gradient(270deg,#f5a623,#6fb7ff);
+}
+.tcp-wire::after{
+  top:62%;
+  background:linear-gradient(90deg,#45d9ce,#6fb7ff);
+}
 .router-chain{
   display:flex;
   align-items:center;
@@ -1161,7 +1179,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     var sNet = centerInMap($('sNet'));
     var cInet = centerInMap($('cInet'));
     var sInet = centerInMap($('sInet'));
-    var wireMidY = (cNet.y + cInet.y) / 2;
+    var forwardY = cNet.y - 26;
+    var backY = cInet.y + 26;
     var leftEdge = {x: pointBetween(cNet, sNet, .33).x, y: cNet.y};
     var rightEdge = {x: pointBetween(cNet, sNet, .67).x, y: sNet.y};
     return {
@@ -1169,8 +1188,10 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       cTrans: centerInMap($('cTrans')),
       cInet: cInet,
       cNet: cNet,
-      r1: {x:leftEdge.x, y:wireMidY},
-      r2: {x:rightEdge.x, y:wireMidY},
+      r1: {x:leftEdge.x, y:forwardY},
+      r2: {x:rightEdge.x, y:forwardY},
+      rb1: {x:leftEdge.x, y:backY},
+      rb2: {x:rightEdge.x, y:backY},
       sNet: sNet,
       sInet: sInet,
       sTrans: centerInMap($('sTrans')),
@@ -1224,12 +1245,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       return '<div class="snapshot-pkt single '+(response?'response':'')+'">'+prefix+'データ</div>';
     }
     var cls = 'snapshot-pkt ' + kind + (response ? ' response' : '');
-    var html = '';
-    for(var i=1;i<=4;i++){
-      var label = kind === 'ip' ? 'IP<br>'+i+'/4' : (kind === 'tcp' ? 'TCP<br>'+i+'/4' : i+'/4');
-      html += '<div class="'+cls+'">'+label+'</div>';
-    }
-    return html;
+    return '<div class="'+cls+'"></div>';
   }
 
   function writeSnapshot(layerId, title, kind, response){
@@ -1394,8 +1410,8 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
       {key:'sTrans', layer:'sTrans', tcp:true, response:true, label:'TCP', snapshot:'TCPを追加・4分割', snapKind:'tcp', explain:'応答データもTCPで4つに分けられ、順番の番号が付きます。'},
       {key:'sInet', layer:'sInet', tcp:true, ip:true, response:true, label:'IP', snapshot:'IPを外側に追加', snapKind:'ip', explain:'今度は送信側PCのIPアドレスを宛先として、IPの情報を外側に付けます。'},
       {key:'sNet', layer:'sNet', tcp:true, ip:true, response:true, label:'0/1', snapshot:'回線へ送信', snapKind:'ip', explain:'Webサーバ側から4つのパケットをネットワークへ送り出します。'},
-      {key:'r2', tcp:true, ip:true, response:true, label:'中継', explain:'応答パケットが少しずつずれてルータ2を通過します。'},
-      {key:'r1', tcp:true, ip:true, response:true, label:'中継', explain:'ルータが宛先IPアドレスを見て、ブラウザ側へ中継します。'},
+      {key:'rb2', tcp:true, ip:true, response:true, label:'中継', explain:'応答パケットは行きとは違う上側の経路でルータ2を通過します。'},
+      {key:'rb1', tcp:true, ip:true, response:true, label:'中継', explain:'帰り道では、ルータが宛先IPアドレスを見てブラウザ側へ中継します。'},
       {key:'cNet', layer:'cNet', tcp:true, ip:true, response:true, label:'受信', snapshot:'回線から受信', snapKind:'ip', explain:'送信側PCのネットワークインタフェース層が4つの応答パケットを受け取ります。'},
       {key:'cInet', layer:'cInet', tcp:true, ip:true, response:true, label:'IP確認', snapshot:'IPを確認して外す', snapKind:'tcp', explain:'IPの情報を確認し、自分宛てのパケットだと分かります。ここでIPの情報は取り外されます。'},
       {key:'cTrans', layer:'cTrans', tcp:true, response:true, label:'TCP復元', snapshot:'TCP番号で復元', snapKind:'single', explain:'TCPが1/4〜4/4の番号を使ってHTMLデータを正しい順番に戻します。'},
