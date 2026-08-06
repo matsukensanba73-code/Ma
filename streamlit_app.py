@@ -667,6 +667,38 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   color:#111827;
   white-space:normal;
 }
+.tcp-payload-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-top:8px;
+}
+.tcp-piece{
+  background:#f7fbf8;
+  border:1px solid #b9dec3;
+  border-left:5px solid #4ade80;
+  border-radius:5px;
+  padding:6px;
+  min-height:48px;
+  font-family:'JetBrains Mono',monospace;
+  color:#152033;
+}
+.tcp-piece-head{
+  display:flex;
+  justify-content:space-between;
+  gap:6px;
+  font-size:10px;
+  font-weight:700;
+  margin-bottom:5px;
+}
+.tcp-piece-body{
+  background:#fff;
+  border:1px solid #d7dde7;
+  border-radius:4px;
+  padding:4px;
+  font-size:10px;
+  line-height:1.35;
+}
 .detail-note{
   color:#dbe7ff;
   font-size:11px;
@@ -1203,12 +1235,24 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
         '<div class="proto-head"><span>HTTP</span><span>中身</span></div>' +
         '<div class="payload-lines">'+app+'<br>'+body+'</div>' +
       '</div>';
+    var parts = step.response
+      ? ['HTML 1', 'HTML 2', 'HTML 3', 'HTML 4']
+      : ['GET', '/index', '.html', '完了'];
+    var tcpPieces = '<div class="tcp-payload-grid">';
+    for(var pi=0; pi<4; pi++){
+      tcpPieces +=
+        '<div class="tcp-piece">' +
+          '<div class="tcp-piece-head"><span>TCP</span><span>'+(pi+1)+'/4</span></div>' +
+          '<div class="tcp-piece-body">'+escapeHtml(parts[pi])+'</div>' +
+        '</div>';
+    }
+    tcpPieces += '</div>';
     var tcpBox =
       '<div class="proto-box tcp-box">' +
         '<div class="proto-head"><span>TCP</span><span>4分割</span></div>' +
         '<div class="proto-row"><span>パケット番号</span><b>1/4〜4/4</b></div>' +
         '<div class="proto-row"><span>役割</span><b>順番を管理</b></div>' +
-        httpBox +
+        tcpPieces +
       '</div>';
     var ipBox =
       '<div class="proto-box ip-box">' +
