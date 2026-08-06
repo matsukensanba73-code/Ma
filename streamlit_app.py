@@ -421,6 +421,19 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
   right:10px;
   justify-content:flex-end;
 }
+.layer-snapshot.return-snapshot{
+  opacity:.72;
+}
+[id^="snapret-c"]{
+  left:auto;
+  right:10px;
+  justify-content:flex-end;
+}
+[id^="snapret-s"]{
+  left:10px;
+  right:auto;
+  justify-content:flex-start;
+}
 .snapshot-pkt{
   position:relative;
   min-width:22px;
@@ -1239,6 +1252,19 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
     });
   }
 
+  function ensureReturnSnapshot(layerId){
+    var id = 'snapret-' + layerId;
+    var el = $(id);
+    if(el) return el;
+    var layer = $(layerId);
+    if(!layer) return null;
+    el = document.createElement('div');
+    el.id = id;
+    el.className = 'layer-snapshot return-snapshot';
+    layer.appendChild(el);
+    return el;
+  }
+
   function snapshotPieces(kind, response){
     var prefix = response ? 'HTML' : 'HTTP';
     if(kind === 'single'){
@@ -1250,7 +1276,7 @@ h1,h2,h3,.disp{font-family:'Space Grotesk','Inter',sans-serif;}
 
   function writeSnapshot(layerId, title, kind, response){
     if(!layerId) return;
-    var el = $('snap-'+layerId);
+    var el = response ? ensureReturnSnapshot(layerId) : $('snap-'+layerId);
     if(!el) return;
     el.innerHTML = '<div class="snapshot-label">'+title+'</div>' + snapshotPieces(kind, response);
   }
